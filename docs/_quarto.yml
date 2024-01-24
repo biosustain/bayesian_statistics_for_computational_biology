@@ -1,0 +1,25 @@
+resource_path: ["../"]
+bibliography: bibliography.bib
+citestyle: ieee.csl
+reference-location: margin
+toc: true
+
+project:
+  type: book
+
+book:
+  title: "Bayesian Statistics for Systems Biologists"
+  author: "Teddy Groves"
+  chapters:
+    - index.md
+    - week1.md
+    - references.md
+
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    include-in-header: mathjax.html
+  # pdf:
+    # documentclass: scrreport
+
