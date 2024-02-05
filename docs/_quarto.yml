@@ -8,7 +8,7 @@ project:
   type: book
 
 book:
-  title: "Bayesian Statistics for Systems Biologists"
+  title: "Bayesian Statistics for Computational Biology"
   author: "Teddy Groves"
   chapters:
     - index.md
