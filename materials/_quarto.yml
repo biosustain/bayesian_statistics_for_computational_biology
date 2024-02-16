@@ -6,6 +6,7 @@ toc: true
 
 project:
   type: website
+  output-dir: "../docs"
   render:
     - index.md
     - week1.md
