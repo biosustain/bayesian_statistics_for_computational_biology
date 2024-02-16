@@ -1,0 +1,34 @@
+resource_path: ["../"]
+bibliography: bibliography.bib
+citestyle: ieee.csl
+reference-location: margin
+toc: true
+
+project:
+  type: website
+  render:
+    - index.md
+    - week1.md
+    - references.md
+
+website:
+  title: "Bayesian Statistics for Computational Biology"
+  sidebar:
+    style: "docked"
+    serach: true
+    contents:
+      - section: "Admin"
+        contents:
+        - index.md
+      - section: "Course materials"
+        contents:
+        - week1.md
+
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    include-in-header: mathjax.html
+  # pdf:
+    # documentclass: scrreport
+

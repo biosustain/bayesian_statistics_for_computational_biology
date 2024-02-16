@@ -1,0 +1,145 @@
+[
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "References",
+    "section": "",
+    "text": "References",
+    "crumbs": [
+      "Reference",
+      "References"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome!",
+    "section": "",
+    "text": "This is a course about Bayesian statistics, targeted at systems biologists.\nThere are three intended learning outcomes:\n\nUnderstand the theoretical basis for applying Bayesian data analysis to practical scientific problems\nDevelop a familiarity with implementing Bayesian data analysis using modern software tools\nGain deep understanding of both theory and practice of elements of Bayesian data analysis that are particularly relevant to computational biology, including custom hierarchical models, large analyses and statistical models with embedded ODE systems.\n\n\n\nEach week we have a one hour seminar. The goal is to spend the time approximately as follows:\n\n25-35mins on ‘theory’, aka learning things from the book and getting more reading material\n25-35mins on practical computer work\n\n\n\n\n\n\n\n\nStatistical inference in general\nBayesian statistical inference\nThe big challenge: dimensionality\n\n\n\nSet up development environment\ngit basics\nInstall Stan and cmdstanpy\n\n\n\nJaynes (2003, Ch. 1)\nLaplace (1986)\n\n\n\n\n\n\nWhat is MCMC?\nHamiltonian Monte Carlo\nProbabilistic programming\n\n\n\nRun an MCMC algorithm and inspect the results\n\n\n\n(betancourtConceptualIntroductionHamiltonian2018?)\n\n\n\n\n\n\nDiagnostics: convergence, divergent transitions, effective sample size\nModel evaluation as decision theory\nWhy negative log likelihood is a good default loss function\n\n\n\nDiagnose some good and bad MCMC runs\n\n\n\nVehtari et al. (2021)\nVehtari, Gelman, and Gabry (2017)\n\n\n\n\n\n\nParts of a statistical anlaysis (not just inference!)\nWhy Bayesian workflow is complex: non-linearity and plurality\nWriting scalable statistical programming projects\n\n\n\nWrite a scalable statistical analysis with bibat.\n\n\n\nGelman et al. (2020)\n\n\n\n\n\n\nGeneralised linear models\nPrior elicitation\nHierarchical models\n\n\n\nCompare some statistical models of a simulated biological dataset\n\n\n\nBetancourt (2024)\n\n\n\n\n\n\nWhat is an ODE?\nODE solvers\nODE solvers inside probabilistic programs\n\n\n\nFit a model with an ODE.\n\n\n\nTimonen et al. (2022)\n\n\n\n\n\n\nClose reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.\n\n\n\nProject brainstorm\n\n\n\n\nFormat: one hour joint feedback and help session",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  },
+  {
+    "objectID": "index.html#general-format",
+    "href": "index.html#general-format",
+    "title": "Welcome!",
+    "section": "",
+    "text": "Each week we have a one hour seminar. The goal is to spend the time approximately as follows:\n\n25-35mins on ‘theory’, aka learning things from the book and getting more reading material\n25-35mins on practical computer work",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  },
+  {
+    "objectID": "week1.html",
+    "href": "week1.html",
+    "title": "What is Bayesian statistical inference?",
+    "section": "",
+    "text": "What is Bayesian statistical inference?\nWhy is it useful in general?\nWhy is it useful in systems biology?\nThe big challenge\n\n\n\n\nSet up git/ssh, python, cmdstanpy and cmdstan\n\n\n\n\n\n\n\n\nA function that can measure the water in a jug.\ni.e. \\(p: S \\rightarrow [0,1]\\) where:\n\n\\(p(S) = 1\\)\nFor disjoint \\(A, B \\in S\\) \\(p(A\\cup B) = p(A) + p(B)\\)\n\n\n\n\n\n\n\n\n\n\nIn: facts about a spoonful sample\nOut: propositions about a soup population\ne.g.\n\nspoonful not salty \\(\\rightarrow\\) soup not salty\nno carrots in spoon \\(\\rightarrow\\) no carrots in soup\n\n\n\n\n\nA nice soup\n\n\n\n\n\n\n\n\n\nStatistical inference resulting in a probability.\ne.g.\n\nspoon \\(\\rightarrow\\) \\(p(\\text{soup not salty})\\) = 99.9%\nspoon \\(\\rightarrow\\) \\(p(\\text{no carrots in soup})\\) = 95.1%\n\nNon-Bayesian inferences:\n\nspoon \\(\\rightarrow\\) Best estimate of [salt] is 0.1mol/l\n\\(p_{null}(\\text{spoon})\\) = 4.9% \\(\\rightarrow\\) no carrots (p=0.049)",
+    "crumbs": [
+      "Course materials",
+      "What is Bayesian statistical inference?"
+    ]
+  },
+  {
+    "objectID": "week1.html#introduction",
+    "href": "week1.html#introduction",
+    "title": "What is Bayesian statistical inference?",
+    "section": "",
+    "text": "What is Bayesian statistical inference?\nWhy is it useful in general?\nWhy is it useful in systems biology?\nThe big challenge\n\n\n\n\nSet up git/ssh, python, cmdstanpy and cmdstan",
+    "crumbs": [
+      "Course materials",
+      "What is Bayesian statistical inference?"
+    ]
+  },
+  {
+    "objectID": "week1.html#what-is-bayesian-statistical-inference-1",
+    "href": "week1.html#what-is-bayesian-statistical-inference-1",
+    "title": "What is Bayesian statistical inference?",
+    "section": "",
+    "text": "A function that can measure the water in a jug.\ni.e. \\(p: S \\rightarrow [0,1]\\) where:\n\n\\(p(S) = 1\\)\nFor disjoint \\(A, B \\in S\\) \\(p(A\\cup B) = p(A) + p(B)\\)\n\n\n\n\n\n\n\n\n\n\nIn: facts about a spoonful sample\nOut: propositions about a soup population\ne.g.\n\nspoonful not salty \\(\\rightarrow\\) soup not salty\nno carrots in spoon \\(\\rightarrow\\) no carrots in soup\n\n\n\n\n\nA nice soup\n\n\n\n\n\n\n\n\n\nStatistical inference resulting in a probability.\ne.g.\n\nspoon \\(\\rightarrow\\) \\(p(\\text{soup not salty})\\) = 99.9%\nspoon \\(\\rightarrow\\) \\(p(\\text{no carrots in soup})\\) = 95.1%\n\nNon-Bayesian inferences:\n\nspoon \\(\\rightarrow\\) Best estimate of [salt] is 0.1mol/l\n\\(p_{null}(\\text{spoon})\\) = 4.9% \\(\\rightarrow\\) no carrots (p=0.049)",
+    "crumbs": [
+      "Course materials",
+      "What is Bayesian statistical inference?"
+    ]
+  },
+  {
+    "objectID": "week1.html#why-is-bayesian-inference-useful-in-systems-biology",
+    "href": "week1.html#why-is-bayesian-inference-useful-in-systems-biology",
+    "title": "What is Bayesian statistical inference?",
+    "section": "Why is Bayesian inference useful in systems biology?",
+    "text": "Why is Bayesian inference useful in systems biology?\n\nRegression models: good for describing measurements\nIdea: measured value systematically but noisily depends on the true value e.g.\n\\(y \\sim N(\\hat{y}, \\sigma)\\)\nBayesian inference lends itself to regression models that accurately describe details of the measurement process. e.g.\n\nheteroskedasticity \\(y \\sim N(\\hat{y}, \\sigma(\\hat{y}))\\)\nnon-negativity \\(y \\sim LN(\\ln{\\hat{y}}, \\sigma)\\) (also compositionality)\nunknown bias \\(y \\sim N(\\hat{y} + q, \\sigma)\\)\n\n\n\nMulti-level models: good for describing sources of variation\n\n\nMeasurement model:\n\\(y \\sim binomial(K, logit(ability))\\)\nGpareto model:\n\\(ability \\sim GPareto(m, k, s)\\)\nNormal model:\n\\(ability \\sim N(\\mu, \\tau)\\)\n\n\n\n\nplot from https://github.com/teddygroves/baseball\n\n\n\n\n\n\nGenerative models: good for representing structural information\n\n\nInformation about hares (\\(u\\)) and lynxes (\\(v\\)):\n\\[\\begin{align*}\n\\frac{d}{dt}u &= (\\alpha - \\beta v)u \\\\\n\\frac{d}{dt}v &= (-\\gamma + \\delta u)v\n\\end{align*}\\]\ni.e. a deterministic function turning \\(\\alpha\\), \\(\\beta\\), \\(\\gamma\\), \\(\\delta\\), \\(u(0)\\) and \\(v(0)\\) into \\(u(t)\\) and \\(v(t)\\).\n\n\n\n\nFrom a Stan case study",
+    "crumbs": [
+      "Course materials",
+      "What is Bayesian statistical inference?"
+    ]
+  },
+  {
+    "objectID": "week1.html#the-big-challenge",
+    "href": "week1.html#the-big-challenge",
+    "title": "What is Bayesian statistical inference?",
+    "section": "The big challenge",
+    "text": "The big challenge\n\nThe big challenge\n\\(p(\\theta \\mid y)\\) is easy to evaluate but hard to integrate.\nThis is bad as we typically want something like\n\\[\np([salt] &lt; 0.1, spoon=s)\n\\]\nwhich is equivalent to\n\\[\n\\int_{0}^{0.1}p([salt], spoon=s)d[salt]\n\\]\n\\(p(\\theta \\mid y)\\) has one dimension per model parameter.\n\n\nThe solution: MCMC\n\n\nStrategy:\n\nFind a series of numbers that\n\nquickly finds the high-probabiliy region in parameter space\nreliably matches its statistical properties\n\nDo sample-based approximate integration.\n\nIt (often) works!\nWe can tell when it doesn’t work!\n\n:",
+    "crumbs": [
+      "Course materials",
+      "What is Bayesian statistical inference?"
+    ]
+  },
+  {
+    "objectID": "week1.html#homework",
+    "href": "week1.html#homework",
+    "title": "What is Bayesian statistical inference?",
+    "section": "Homework",
+    "text": "Homework\n\nThings to read\nBox and Tiao (1992) Ch. 1.1 (available from dtu findit) gives a nice explanation of statistical inference in general and why Bayes.\nHistorical interest:\n\nLaplace (1986) and Stigler (1986)\nJaynes (2003) Preface\n\n\n\nThings to set up\n\nPython\nFirst get a recent (ideally 3.10+) version of Python This can be very annoying so talk to me if necessary!\nNext get used to Python virtual environments.\nThe method I like is to put the virtual environment in a folder .venv inside the root of my project:\n$ python -m venv .venv --prompt=bssb\nThen to use: Tip: use an ergonomic alias to activate venvs e.g. alias va=\"source .venv/bin/activate\"\n$ source .venv/bin/activate\n# ... do work\n$ deactivate\n\n\nGit and ssh\ngit clone git@github.com:teddygroves/bayesian_statistics_for_systems_biologists.git\n\n\nCmdstanpy and cmdstan\nfrom cmdstanpy import CmdStanModel\nfilename = \"example_stan_program.stan\" \ncode = \"data {} parameters {real t;} model {t ~ std_normal();}\"\nwith open(filename, \"w\") as f:\n    f.write(code)\nmodel = CmdStanModel(stan_file=filename)\nmcmc = model.sample()",
+    "crumbs": [
+      "Course materials",
+      "What is Bayesian statistical inference?"
+    ]
+  },
+  {
+    "objectID": "index.html#learning-outcome",
+    "href": "index.html#learning-outcome",
+    "title": "Welcome!",
+    "section": "",
+    "text": "There are three main intended learning outcomes.\n\nUnderstand the theoretical basis for applying Bayesian data analysis to practical scientific problems\nDevelop a familiarity with implementing Bayesian data analysis using modern software tools\nGain deep understanding of both theory and practice of elements of Bayesian data analysis that are particularly relevant to computational biology, including custom hierarchical models, large analyses and statistical models with embedded ODE systems.",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  },
+  {
+    "objectID": "index.html#plan",
+    "href": "index.html#plan",
+    "title": "Welcome!",
+    "section": "",
+    "text": "Statistical inference in general\nBayesian statistical inference\nThe big challenge: dimensionality\n\n\n\nSet up development environment\ngit basics\nInstall Stan and cmdstanpy\n\n\n\nJaynes (2003, Ch. 1)\nLaplace (1986)\n\n\n\n\n\n\nWhat is MCMC?\nHamiltonian Monte Carlo\nProbabilistic programming\n\n\n\nRun an MCMC algorithm and inspect the results\n\n\n\n(betancourtConceptualIntroductionHamiltonian2018?)\n\n\n\n\n\n\nDiagnostics: convergence, divergent transitions, effective sample size\nModel evaluation as decision theory\nWhy negative log likelihood is a good default loss function\n\n\n\nDiagnose some good and bad MCMC runs\n\n\n\nVehtari et al. (2021)\nVehtari, Gelman, and Gabry (2017)\n\n\n\n\n\n\nParts of a statistical anlaysis (not just inference!)\nWhy Bayesian workflow is complex: non-linearity and plurality\nWriting scalable statistical programming projects\n\n\n\nWrite a scalable statistical analysis with bibat.\n\n\n\nGelman et al. (2020)\n\n\n\n\n\n\nGeneralised linear models\nPrior elicitation\nHierarchical models\n\n\n\nCompare some statistical models of a simulated biological dataset\n\n\n\nBetancourt (2024)\n\n\n\n\n\n\nWhat is an ODE?\nODE solvers\nODE solvers inside probabilistic programs\n\n\n\nFit a model with an ODE.\n\n\n\nTimonen et al. (2022)\n\n\n\n\n\n\nClose reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.\n\n\n\nProject brainstorm\n\n\n\n\nFormat: one hour joint feedback and help session",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  },
+  {
+    "objectID": "index.html#reading",
+    "href": "index.html#reading",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Reading",
+    "text": "Reading\n\n(Jaynes 2003, Ch. 1)\n(Laplace 1986)\n\nWeek 2: MCMC\nTheory\nWhat is MCMC?\nHamiltonian Monte Carlo\nProbabilistic programming\nPractice\nRun an MCMC algorithm and inspect the results\nReading\n[3]\nWeek 3: After MCMC: diagnostics, and decisions\nTheory\nDiagnostics: convergence, divergent transitions, effective sample size\nModel evaluation as decision theory\nWhy negative log likelihood is a good default loss function\nPractice\nDiagnose some good and bad MCMC runs\n[4] [5]\nWeek 4: Bayesian workflow\nTheory\nParts of a statistical anlaysis (not just inference!)\nWhy Bayesian workflow is complex: non-linearity and plurality\nWriting scalable statistical programming projects\nPractice\nWrite a scalable statistical analysis with bibat\nReading\n[6]\nWeek 5: Regression models in biology\nTheory\nGeneralised linear models\nPrior elicitation\nHierarchical models\nPractice\nCompare some statistical models of a simulated biological dataset\nReading\n[7]\nWeek 6: ODEs\nTheory\nWhat is an ODE?\nODE solvers\nODE solvers inside probabilistic programs\n[8]\nWeek 7: Case study: a large biological analysis\nTheory\nClose reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.\nPractice\nProject brainstorm\nWeek 8-10: Project\nFormat: one hour joint feedback and help session\n[1] E. T. Jaynes, Probability theory: the logic of science. Cambridge, UK: Cambridge University Press, 2003.\n[2] P. S. Laplace, “Memoir on the Probability of the Causes of Events,” Stat. Sci., vol. 1, no. 3, Aug. 1986, doi: 10.1214/ss/1177013621.\n[3] M. Betancourt, “A Conceptual Introduction to Hamiltonian Monte Carlo,” ArXiv170102434 Stat, Jul. 2018, Accessed: Sep. 28, 2020. [Online]. Available: http://arxiv.org/abs/1701.02434\n[4] A. Vehtari, A. Gelman, D. Simpson, B. Carpenter, and P.-C. Bürkner, “Rank-Normalization, Folding, and Localization: An Improved Rˆ for Assessing Convergence of MCMC (with Discussion),” Bayesian Anal., vol. 16, no. 2, pp. 667–718, Jun. 2021, doi: 10.1214/20-BA1221.\n[5] A. Vehtari, A. Gelman, and J. Gabry, “Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC,” Stat. Comput., vol. 27, no. 5, pp. 1413–1432, Sep. 2017, doi: 10.1007/s11222-016-9696-4.\n[6] A. Gelman et al., “Bayesian Workflow,” ArXiv201101808 Stat, Nov. 2020, Accessed: Nov. 05, 2020. [Online]. Available: http://arxiv.org/abs/2011.01808\n[7] “Hierarchical Modeling.” Accessed: Jan. 31, 2024. [Online]. Available: https://betanalpha.github.io/assets/case_studies/hierarchical_modeling.html\n[8] J. Timonen, N. Siccha, B. Bales, H. Lähdesmäki, and A. Vehtari, “An importance sampling approach for reliable and efficient inference in Bayesian ordinary differential equation models.” arXiv, May 18, 2022. doi: 10.48550/arXiv.2205.09059.",
+    "crumbs": [
+      "Admin",
+      "General format"
+    ]
+  },
+  {
+    "objectID": "index.html#learning-outcomes",
+    "href": "index.html#learning-outcomes",
+    "title": "Welcome!",
+    "section": "",
+    "text": "There are three intended learning outcomes:\n\nUnderstand the theoretical basis for applying Bayesian data analysis to practical scientific problems\nDevelop a familiarity with implementing Bayesian data analysis using modern software tools\nGain deep understanding of both theory and practice of elements of Bayesian data analysis that are particularly relevant to computational biology, including custom hierarchical models, large analyses and statistical models with embedded ODE systems.",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  }
+]
