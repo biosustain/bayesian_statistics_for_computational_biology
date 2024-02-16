@@ -3,38 +3,57 @@
 
 ### Today's topics
 
-1. What is Bayesian statistical inference?
-2. Why is it useful in general?
-3. Why is it useful in systems biology?
-4. The big challenge
+1. [What is Bayesian statistical inference?](#what-is-bayesian-statistical-inference)
+2. [Why is it useful in general?](#why-is-bayesian-statistical-inference-useful-in-general)
+3. [Why is it useful in systems biology?](#why-is-bayesian-inference-useful-in-systems-biology)
+4. [The big challenge](#the-big-challenge)
 
 ### Computer goals
 
-Set up git/ssh, python, cmdstanpy and cmdstan
+Set up git/ssh, Python, cmdstanpy and cmdstan
 
 ## What is Bayesian statistical inference?
 
 ### Probability function
-:::: {.columns align=top totalwidth=8em}
-::: {.column width="60%"}
+:::{#fig-jug}
+![](img/jug.jpg)
+
+A jug of water
+:::
+
 A function that can measure the water in a jug.
 
-i.e. $p: S \rightarrow [0,1]$ where:
+i.e.
 
-- $p(S) = 1$
-- For disjoint $A, B \in S$ $p(A\cup B) = p(A) + p(B)$
+$p: S \rightarrow [0,1]$ where
 
-:::
+- $S$ is an [event space](https://en.wikipedia.org/wiki/Event_(probability_theory)#Events_in_probability_spaces) 
+- If $A, B \in S$ are disjoint, then $p(A\cup B) = p(A) + p(B)$
 
-::: {.column width="40%"}
-![](img/jug.jpg)
-:::
+### Bayesian epistemology
 
-:::: 
+Probability functions can (sometimes...) describe belief/information. E.g.
+
+"Definitely B":
+
+![](img/definitely_b.jpg){width=50%}
+
+"Not sure if A or B":
+
+![](img/not_sure.jpg){width=50%}
+
+"B a bit more plausible than A":
+
+![](img/probably_b.jpg){width=50%}
 
 ### Statistical Inference
-:::: {.columns align=top totalwidth=8em}
-::: {.column width="60%"}
+
+::: {#fig-soup}
+![](img/soup.jpg)
+
+A nice soup: [here is the recipe](https://www.theguardian.com/lifeandstyle/2017/jan/24/20-best-one-pot-recipes-part-2-tom-kerridge-nigella-lawson-broths-hangover-food)
+
+:::
 
 In: facts about a ~~spoonful~~ sample
 
@@ -45,18 +64,15 @@ e.g.
 - spoonful not salty $\rightarrow$ soup not salty
 - no carrots in spoon $\rightarrow$ no carrots in soup
 
-:::
-
-::: {.column width="40%"}
-![[A nice soup](https://www.theguardian.com/lifeandstyle/2017/jan/24/20-best-one-pot-recipes-part-2-tom-kerridge-nigella-lawson-broths-hangover-food)](img/soup.jpg)
-:::
-
-:::: 
 
 ### Bayesian statistical inference
+:::{#fig-soup-jug}
 
-:::: {.columns align=top totalwidth=8em}
-::: {.column width="60%"}
+![](img/soup_with_jug.jpg){width=50%}
+
+A jug of soup
+
+:::
 
 Statistical inference resulting in a probability.
 
@@ -70,25 +86,21 @@ Non-Bayesian inferences:
 - spoon $\rightarrow$ Best estimate of [salt] is 0.1mol/l
 - $p_{null}(\text{spoon})$ = 4.9% $\rightarrow$ no carrots (p=0.049)
 
-:::
-
-::: {.column width="30%"}
-
-![](img/soup_with_jug.jpg){height=300 fig-align=right}
-
-:::
-
-::::
 
 # Why is Bayesian statistical inference useful in general?
 
-### The philosophical reason
+### Philosophical reason
 
-:::: {.columns align=top totalwidth=8em}
-::: {.column width="60%"}
+::: {#fig-jaynes width="40%"}
 
-Bayesian inference can be interpreted in terms of information and plausible
-reasoning.
+[![](img/jaynes.jpg){height=80%}](https://readyforai.com/download/probability-theory-the-logic-of-science-pdf/)
+
+It's a good book!
+
+:::
+
+Bayesian inference produces probabilities, which can be interpreted in terms of
+information and plausible reasoning.
 
 e.g. "According to the model..."
 
@@ -96,19 +108,15 @@ e.g. "According to the model..."
 * "...x is more plausible than y."
 * "...the data doesn't contain enough information for firm conclusions about x."
 
-:::
-
-::: {.column width="40%"}
-
-![](img/jaynes.jpg){height=80% fig-align=right}
-
-:::
-
-::::
 
 ### Mathematical reason
-:::: {.columns align=top totalwidth=8em}
-::: {.column width="60%"}
+::: {#fig-laplace width="40%"}
+
+[![(https://en.wikipedia.org/wiki/Pierre-Simon_Laplace)](img/laplace.jpg)](https://en.wikipedia.org/wiki/Pierre-Simon_Laplace){height=80%}
+
+Laplace, who did Bayesian inference in the 1780s
+:::
+
 
 Bayesian inference is old!
 
@@ -117,16 +125,6 @@ This means
 * it is well understood mathematically.
 * conceptual surprises are relatively rare.
 * there are many compatible frameworks.
-
-:::
-
-::: {.column width="40%"}
-
-![[Laplace, who did Bayesian inference in the 1780s](https://en.wikipedia.org/wiki/Pierre-Simon_Laplace)](img/laplace.jpg){height=80%}
-
-:::
-
-::::
 
 ### General practical reason
 
@@ -157,8 +155,11 @@ details of the measurement process. e.g.
 
 ### Multi-level models: good for describing sources of variation
 
-:::: {.columns align=top totalwidth=8em}
-::: {.column width="40%"}
+::: {#fig-baseball}
+![](img/baseball.png)
+
+plot from <https://github.com/teddygroves/baseball>
+:::
 
 Measurement model:
 
@@ -172,18 +173,14 @@ Normal model:
 
 $ability \sim N(\mu, \tau)$
 
-:::
-
-::: {.column width="60%"}
-![plot from <https://github.com/teddygroves/baseball>](img/baseball.png)
-:::
-
-::::
 
 ### Generative models: good for representing structural information
 
-:::: {.columns align=top totalwidth=8em}
-::: {.column width="60%"}
+::: {#fig-lotka-volterra}
+![](img/lv.png)
+
+From a [Stan case study](https://mc-stan.org/users/documentation/case-studies/lotka-volterra-predator-prey.html)
+:::
 
 Information about hares ($u$) and lynxes ($v$):
 
@@ -195,15 +192,8 @@ Information about hares ($u$) and lynxes ($v$):
 i.e. a deterministic function turning $\alpha$, $\beta$, $\gamma$, $\delta$,
 $u(0)$ and $v(0)$ into $u(t)$ and $v(t)$.
 
-:::
-
-::: {.column width="40%"}
-![From a [Stan case study](https://mc-stan.org/users/documentation/case-studies/lotka-volterra-predator-prey.html)](img/lv.png)
-:::
-
-::::
-
 ## The big challenge
+
 ### The big challenge
 
 $p(\theta \mid y)$ is easy to evaluate but hard to integrate.
@@ -224,9 +214,11 @@ $p(\theta \mid y)$ has one dimension per model parameter.
 
 ### The solution: MCMC
 
-:::: {.columns align=top totalwidth=8em}
-::: {.column width="60%"}
+::: {#fig-mcmc}
+![](img/mcmc.png): 
 
+An image I found [online](http://mlg.eng.cam.ac.uk/tutorials/06/im.pdf)
+:::
 
 
 Strategy:
@@ -241,19 +233,11 @@ It (often) works!
 
 We can tell when it doesn't work!
 
-:::
-
-::: {.column width="40%"}
-![An image I found [online](http://mlg.eng.cam.ac.uk/tutorials/06/im.pdf)](img/mcmc.png): 
-:::
-
-::::
-
 ## Homework 
 
 ### Things to read
 
-@boxBayesianInferenceStatistical1992 Ch. 1.1 (available from dtu findit) gives a
+@boxBayesianInferenceStatistical1992 [Ch. 1.1] (available from dtu findit) gives a
 nice explanation of statistical inference in general and why Bayes.
 
 Historical interest:
@@ -265,14 +249,14 @@ Historical interest:
 
 #### Python
 
-First get a recent (ideally 3.10+) version of Python This can be very annoying so talk to me if necessary!
+First get a recent (ideally 3.11+) version of Python This can be very annoying so talk to me if necessary!
 
 Next get used to Python virtual environments. 
 
 The method I like is to put the virtual environment in a folder `.venv` inside the root of my project:
 
 ```shell
-$ python -m venv .venv --prompt=bssb
+$ python -m venv .venv --prompt=bscb
 ```
 
 Then to use:  [Tip: use an ergonomic alias to activate venvs e.g. `alias va="source .venv/bin/activate"`]{.aside}
@@ -283,9 +267,8 @@ $ source .venv/bin/activate
 $ deactivate
 ```
 
-
 #### Git and ssh
-\tiny
+
 ```shell
 git clone git@github.com:teddygroves/bayesian_statistics_for_systems_biologists.git
 ```

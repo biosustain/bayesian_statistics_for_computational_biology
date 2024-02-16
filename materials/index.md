@@ -17,7 +17,7 @@ ODE systems.
 
 ## General format
 
-Each week we have a one hour seminar. The goal is to spend the time approximately
+Each week we have a one-hour seminar. The goal is to spend the time approximately
 as follows:
 
 1. 25-35mins on 'theory', aka learning things from the book and getting more
@@ -50,6 +50,8 @@ Install Stan and cmdstanpy
 @jaynesProbabilityTheoryLogic2003 [Ch. 1]
 
 @laplaceMemoirProbabilityCauses1986
+
+@boxBayesianInferenceStatistical1992 [Ch. 1.1]
 
  
 ### Week 2: MCMC 
