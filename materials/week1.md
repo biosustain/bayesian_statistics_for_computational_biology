@@ -1,11 +1,3 @@
----
-format:
-  revealjs:
-    toc: false
-    smaller: true
-    scrollable: true
-    slide-level: 3
----
 # Introduction to Bayesian inference
 ## Introduction
 
