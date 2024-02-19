@@ -10,6 +10,7 @@ project:
   render:
     - index.md
     - week1.md
+    - week2.md
 
 website:
   title: "Bayesian Statistics for Computational Biology"
@@ -27,6 +28,7 @@ website:
       - section: "Course materials"
         contents:
         - week1.md
+        - week2.md
 
 format:
   html:

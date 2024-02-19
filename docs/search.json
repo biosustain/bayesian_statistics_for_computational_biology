@@ -1,68 +1,57 @@
 [
   {
-    "objectID": "week1.html",
-    "href": "week1.html",
-    "title": "What is Bayesian statistical inference?",
+    "objectID": "week2.html",
+    "href": "week2.html",
+    "title": "MCMC and Stan",
     "section": "",
-    "text": "What is Bayesian statistical inference?\nWhy is it useful in general?\nWhy is it useful in systems biology?\nThe big challenge\n\n\n\n\nSet up git/ssh, Python, cmdstanpy and cmdstan\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 1: A jug of water\n\n\n\nA function that can measure the water in a jug.\ni.e.\n\\(p: S \\rightarrow [0,1]\\) where\n\n\\(S\\) is an event space\nIf \\(A, B \\in S\\) are disjoint, then \\(p(A\\cup B) = p(A) + p(B)\\)\n\n\n\n\nProbability functions can (sometimes…) describe belief/information. E.g.\n“Definitely B”:\n\n“Not sure if A or B”:\n\n“B a bit more plausible than A”:\n\n\n\n\n\n\n\n\n\n\nFigure 2: A nice soup: here is the recipe\n\n\n\nIn: facts about a spoonful sample\nOut: propositions about a soup population\ne.g.\n\nspoonful not salty \\(\\rightarrow\\) soup not salty\nno carrots in spoon \\(\\rightarrow\\) no carrots in soup\n\n\n\n\n\n\n\n\n\n\nFigure 3: A jug of soup\n\n\n\nStatistical inference resulting in a probability.\ne.g.\n\nspoon \\(\\rightarrow\\) \\(p(\\text{soup not salty})\\) = 99.9%\nspoon \\(\\rightarrow\\) \\(p(\\text{no carrots in soup})\\) = 95.1%\n\nNon-Bayesian inferences:\n\nspoon \\(\\rightarrow\\) Best estimate of [salt] is 0.1mol/l\n\\(p_{null}(\\text{spoon})\\) = 4.9% \\(\\rightarrow\\) no carrots (p=0.049)",
+    "text": "Welcome back!\nPlan for today:\n\nMCMC\nGetting started with Stan in Python\n\nRecap from last week:\nBayesian inference: Statistical inference resulting in probabilities\nWhy in general? Probability is expressive, old and decomposes nicely\nWhy in biology? Hierarchical regression models with ODEs\nThe big challenge Integrating high dimensional probability functions\n\n\n\n\n\nIn A rule for evaluating the target function and maybe its gradients\nOut: A Markov Chain of numbers that you can do Monte Carlo integration with.\n\n\n\n\n\n\nOne random variable \\(X\\) with probability density function \\(density\\).\nAka a “one-dimensional parameter space”.\nEvaluating \\(density(x)\\) for a given value \\(x\\) (aka “point in parameter space”) is easy.\nCalculating the area under a region of the \\(density\\) curve (aka “the probability mass”) is expensive.\nThis is annoying, we need to know that!\n\n\n\nGenerate a series \\(x_1, ..., x_i,..., x_n\\) where every number depends on the previous number(s), i.e. a Markov chain.\nTo calculate \\(x_{i+1}\\), generate a random number and take into account \\(density(x_i)\\). 1\n1 This is the interesting and tricky bit!\nIf this works, with a long enough series of numbers we get something like this:\n\n\n\n\n\n\n\nSuccess condition for MCMC\n\n\n\nThe numbers from the Markov chain have to approximately agree with the target density function, i.e. in any region the number of dots is approximately proportional to the area under the curve.\n\n\nNow we can do Monte Carlo integration, i.e. approximate the area under a region of curve by counting the red dots in that region.\n\n\n\n\nThe first (I think?) MCMC algorithm. Original paper: Metropolis et al. (1953).2\n2 Metropolis was first author but didn’t do any work! That was Arianna Rosenbluth (programming) plus Marshall Rosenbluth & Edward Teller (maths)Generates Markov chains that provably agree with arbitrary target density functions (in the asymptotic limit).\nRoughly how it works:\n\nChoose candidate by randomly perturbing previous point \\(x_i\\)\nAccept or reject candidate randomly according to the ratio \\(\\frac{density(candidate)}{density(x_i)}\\)\n\\(x_{i+1}\\) is candidate if accept else x_i\n\nVisualisation\nDoesn’t work for more than ~10 dimensional parameter spaces.\n\n\n\nBig picture: MCMC that works for large parameter spaces.\nKey innovation: travel through parameter space quickly using gradients.\nIllustration:\n\nA better illustration\n{.callout-note} ### A small but important detail:\nTo decide how hard to flick the ball and how precisely to calculate its trajectory for a particular case, adaptation is required, i.e. running the algorithm in warm-up mode for a bit and learning by trial and error. How best to do adaptation is an important open question.\n:::\nLimitations:\n\nNo discrete parameters\nPerforms badly when the target (log-scale) density function is wiggly.\n\n\n\nBetancourt (2018b)\nBetancourt (2018a)\nBeskos et al. (2010)\n\n\n\n\n\nStan is:\n\nA language for specifying probability density functions as Stan programs.\nA compiler that turns Stan programs into instructions for inference engines.\nAn inference engine implementing adaptive HMC and some other algorithms.\nA library of functions for calculating the gradients of interesting probability density functions.\nSome interfaces for popular computer tools:\n\nCommand line: cmdstan\nPython:\n\ncmdstanpy\npystan\n\nR:\n\ncmdstanr\nRstan\n\n\n\n\n\nAlternatives: pymc, blackjax, Turing.jl tensorflow probability\nOverview as of 2023: Štrumbelj et al. (2023).\nWhy I like Stan:\n\nBig, active and knowledgeable community (most important reason)\nFeatureful (complex numbers, fast solvers, up-to-date diagnostics)\nFast (for CPU-bound, general purpose adaptive HMC)\n\n\n\n\n\nInstall cmdstanpy\npip install cmdstanpy\nUse cmdstanpy to install the rest of Stan\npython -m cmdstanpy.install_cmdstan --cores 2\nI like to store Stan outputs using the library arviz. It also makes nice plots.\npip install arviz\n\n\nA Stan program consists of function definitions, variable declarations and statements, organised into {...} delimited blocks, e.g.\ndata {\n  real y;  # a variable declaration\n}\nmodel {\n  y ~ normal(0, 1.4);  # a statement\n}\nThe purpose of a Stan program is to define the probability density for any combination of data and parameters.\nIt is ok for there to be no parameters:\ntransformed data {\n  real y = 2;  # this is both a statement and a declaration!\n}\nmodel {\n  y ~ normal(0, 1.4);  # the total density is N(2 | 0, 1.4) = 0.103\n}\nor no data:\nparameters {\n  real alpha;\n}\nmodel {\n  alpha ~ normal(0, 1.4);  # Stan can find the density for any alpha\n}\n\n\n\n\n\nUse standard Python tools to make a dictionary mapping data variables to inputs e.g.\nmy_stan_input = {\"y\": 2}\n(Optional) Save the input as a json file:\nimport json\nwith open(\"my_stan_input.json\", \"w\") as f:\n    json.dump(my_stan_input, f)\n\n\n\nInstantiate a CmdstanModel\nfrom cmdstanpy import CmdStanModel\nmy_model = CmdStanModel(stan_file=\"my_stan_program.stan\")\nCmdstanpy will use Stan’s compiler to create .hpp and executable files.\n\n\n\nUse the method CmdStanModel.sample to trigger adaptive HMC.\nmy_mcmc_results = my_model.sample(data=my_stan_input)\n\n\n\nUse the methods CmdStanMCMC.diagnose and CmdStanMCMC.summary for quick diagnostics.\nsummary = my_mcmc_results.summary()\ndiagnostics = my_mcmc_results.diagnose()\n\n\n\nConvert to arviz InferenceData and save\nimport arviz\nmy_idata = arviz.from_cmdstanpy(my_mcmc_results)\nmy_idata.to_json(\"my_arviz_idata.json\")\n\n\n\n\nCmdstanpy docs\nStan reference manual\nStan functions reference\nStan User’s guide\nstan-dev github organisation\n\n\n\nhttps://github.com/abdulfatir/sampling-methods-numpy/blob/master/Metropolis-Hastings.ipynb",
     "crumbs": [
       "Course materials",
-      "What is Bayesian statistical inference?"
+      "MCMC and Stan"
     ]
   },
   {
-    "objectID": "week1.html#introduction",
-    "href": "week1.html#introduction",
-    "title": "What is Bayesian statistical inference?",
+    "objectID": "week2.html#introduction",
+    "href": "week2.html#introduction",
+    "title": "MCMC and Stan",
     "section": "",
-    "text": "What is Bayesian statistical inference?\nWhy is it useful in general?\nWhy is it useful in systems biology?\nThe big challenge\n\n\n\n\nSet up git/ssh, Python, cmdstanpy and cmdstan",
+    "text": "Welcome back!\nPlan for today:\n\nMCMC\nGetting started with Stan in Python\n\nRecap from last week:\nBayesian inference: Statistical inference resulting in probabilities\nWhy in general? Probability is expressive, old and decomposes nicely\nWhy in biology? Hierarchical regression models with ODEs\nThe big challenge Integrating high dimensional probability functions",
     "crumbs": [
       "Course materials",
-      "What is Bayesian statistical inference?"
+      "MCMC and Stan"
     ]
   },
   {
-    "objectID": "week1.html#what-is-bayesian-statistical-inference-1",
-    "href": "week1.html#what-is-bayesian-statistical-inference-1",
-    "title": "What is Bayesian statistical inference?",
+    "objectID": "week2.html#mcmc",
+    "href": "week2.html#mcmc",
+    "title": "MCMC and Stan",
     "section": "",
-    "text": "Figure 1: A jug of water\n\n\n\nA function that can measure the water in a jug.\ni.e.\n\\(p: S \\rightarrow [0,1]\\) where\n\n\\(S\\) is an event space\nIf \\(A, B \\in S\\) are disjoint, then \\(p(A\\cup B) = p(A) + p(B)\\)\n\n\n\n\nProbability functions can (sometimes…) describe belief/information. E.g.\n“Definitely B”:\n\n“Not sure if A or B”:\n\n“B a bit more plausible than A”:\n\n\n\n\n\n\n\n\n\n\nFigure 2: A nice soup: here is the recipe\n\n\n\nIn: facts about a spoonful sample\nOut: propositions about a soup population\ne.g.\n\nspoonful not salty \\(\\rightarrow\\) soup not salty\nno carrots in spoon \\(\\rightarrow\\) no carrots in soup\n\n\n\n\n\n\n\n\n\n\nFigure 3: A jug of soup\n\n\n\nStatistical inference resulting in a probability.\ne.g.\n\nspoon \\(\\rightarrow\\) \\(p(\\text{soup not salty})\\) = 99.9%\nspoon \\(\\rightarrow\\) \\(p(\\text{no carrots in soup})\\) = 95.1%\n\nNon-Bayesian inferences:\n\nspoon \\(\\rightarrow\\) Best estimate of [salt] is 0.1mol/l\n\\(p_{null}(\\text{spoon})\\) = 4.9% \\(\\rightarrow\\) no carrots (p=0.049)",
+    "text": "In A rule for evaluating the target function and maybe its gradients\nOut: A Markov Chain of numbers that you can do Monte Carlo integration with.\n\n\n\n\n\n\nOne random variable \\(X\\) with probability density function \\(density\\).\nAka a “one-dimensional parameter space”.\nEvaluating \\(density(x)\\) for a given value \\(x\\) (aka “point in parameter space”) is easy.\nCalculating the area under a region of the \\(density\\) curve (aka “the probability mass”) is expensive.\nThis is annoying, we need to know that!\n\n\n\nGenerate a series \\(x_1, ..., x_i,..., x_n\\) where every number depends on the previous number(s), i.e. a Markov chain.\nTo calculate \\(x_{i+1}\\), generate a random number and take into account \\(density(x_i)\\). 1\n1 This is the interesting and tricky bit!\nIf this works, with a long enough series of numbers we get something like this:\n\n\n\n\n\n\n\nSuccess condition for MCMC\n\n\n\nThe numbers from the Markov chain have to approximately agree with the target density function, i.e. in any region the number of dots is approximately proportional to the area under the curve.\n\n\nNow we can do Monte Carlo integration, i.e. approximate the area under a region of curve by counting the red dots in that region.\n\n\n\n\nThe first (I think?) MCMC algorithm. Original paper: Metropolis et al. (1953).2\n2 Metropolis was first author but didn’t do any work! That was Arianna Rosenbluth (programming) plus Marshall Rosenbluth & Edward Teller (maths)Generates Markov chains that provably agree with arbitrary target density functions (in the asymptotic limit).\nRoughly how it works:\n\nChoose candidate by randomly perturbing previous point \\(x_i\\)\nAccept or reject candidate randomly according to the ratio \\(\\frac{density(candidate)}{density(x_i)}\\)\n\\(x_{i+1}\\) is candidate if accept else x_i\n\nVisualisation\nDoesn’t work for more than ~10 dimensional parameter spaces.\n\n\n\nBig picture: MCMC that works for large parameter spaces.\nKey innovation: travel through parameter space quickly using gradients.\nIllustration:\n\nA better illustration\n{.callout-note} ### A small but important detail:\nTo decide how hard to flick the ball and how precisely to calculate its trajectory for a particular case, adaptation is required, i.e. running the algorithm in warm-up mode for a bit and learning by trial and error. How best to do adaptation is an important open question.\n:::\nLimitations:\n\nNo discrete parameters\nPerforms badly when the target (log-scale) density function is wiggly.\n\n\n\nBetancourt (2018b)\nBetancourt (2018a)\nBeskos et al. (2010)",
     "crumbs": [
       "Course materials",
-      "What is Bayesian statistical inference?"
+      "MCMC and Stan"
     ]
   },
   {
-    "objectID": "week1.html#why-is-bayesian-inference-useful-in-systems-biology",
-    "href": "week1.html#why-is-bayesian-inference-useful-in-systems-biology",
-    "title": "What is Bayesian statistical inference?",
-    "section": "Why is Bayesian inference useful in systems biology?",
-    "text": "Why is Bayesian inference useful in systems biology?\n\nRegression models: good for describing measurements\nIdea: measured value systematically but noisily depends on the true value e.g.\n\\(y \\sim N(\\hat{y}, \\sigma)\\)\nBayesian inference lends itself to regression models that accurately describe details of the measurement process. e.g.\n\nheteroskedasticity \\(y \\sim N(\\hat{y}, \\sigma(\\hat{y}))\\)\nnon-negativity \\(y \\sim LN(\\ln{\\hat{y}}, \\sigma)\\) (also compositionality)\nunknown bias \\(y \\sim N(\\hat{y} + q, \\sigma)\\)\n\n\n\nMulti-level models: good for describing sources of variation\n\n\n\n\n\n\nFigure 6: plot from https://github.com/teddygroves/baseball\n\n\n\nMeasurement model:\n\\(y \\sim binomial(K, logit(ability))\\)\nGpareto model:\n\\(ability \\sim GPareto(m, k, s)\\)\nNormal model:\n\\(ability \\sim N(\\mu, \\tau)\\)\n\n\nGenerative models: good for representing structural information\n\n\n\n\n\n\nFigure 7: From a Stan case study\n\n\n\nInformation about hares (\\(u\\)) and lynxes (\\(v\\)):\n\\[\\begin{align*}\n\\frac{d}{dt}u &= (\\alpha - \\beta v)u \\\\\n\\frac{d}{dt}v &= (-\\gamma + \\delta u)v\n\\end{align*}\\]\ni.e. a deterministic function turning \\(\\alpha\\), \\(\\beta\\), \\(\\gamma\\), \\(\\delta\\), \\(u(0)\\) and \\(v(0)\\) into \\(u(t)\\) and \\(v(t)\\).",
+    "objectID": "week2.html#stan",
+    "href": "week2.html#stan",
+    "title": "MCMC and Stan",
+    "section": "",
+    "text": "Stan is:\n\nA language for specifying probability density functions as Stan programs.\nA compiler that turns Stan programs into instructions for inference engines.\nAn inference engine implementing adaptive HMC and some other algorithms.\nA library of functions for calculating the gradients of interesting probability density functions.\nSome interfaces for popular computer tools:\n\nCommand line: cmdstan\nPython:\n\ncmdstanpy\npystan\n\nR:\n\ncmdstanr\nRstan\n\n\n\n\n\nAlternatives: pymc, blackjax, Turing.jl tensorflow probability\nOverview as of 2023: Štrumbelj et al. (2023).\nWhy I like Stan:\n\nBig, active and knowledgeable community (most important reason)\nFeatureful (complex numbers, fast solvers, up-to-date diagnostics)\nFast (for CPU-bound, general purpose adaptive HMC)",
     "crumbs": [
       "Course materials",
-      "What is Bayesian statistical inference?"
+      "MCMC and Stan"
     ]
   },
   {
-    "objectID": "week1.html#the-big-challenge",
-    "href": "week1.html#the-big-challenge",
-    "title": "What is Bayesian statistical inference?",
-    "section": "The big challenge",
-    "text": "The big challenge\n\nThe big challenge\n\\(p(\\theta \\mid y)\\) is easy to evaluate but hard to integrate.\nThis is bad as we typically want something like\n\\[\np([salt] &lt; 0.1, spoon=s)\n\\]\nwhich is equivalent to\n\\[\n\\int_{0}^{0.1}p([salt], spoon=s)d[salt]\n\\]\n\\(p(\\theta \\mid y)\\) has one dimension per model parameter.\n\n\nThe solution: MCMC\n\n\n\n\n\n\nFigure 8: An image I found online\n\n\n\nStrategy:\n\nFind a series of numbers that\n\nquickly finds the high-probabiliy region in parameter space\nreliably matches its statistical properties\n\nDo sample-based approximate integration.\n\nIt (often) works!\nWe can tell when it doesn’t work!",
+    "objectID": "week2.html#getting-started-with-stan-in-python",
+    "href": "week2.html#getting-started-with-stan-in-python",
+    "title": "MCMC and Stan",
+    "section": "",
+    "text": "Install cmdstanpy\npip install cmdstanpy\nUse cmdstanpy to install the rest of Stan\npython -m cmdstanpy.install_cmdstan --cores 2\nI like to store Stan outputs using the library arviz. It also makes nice plots.\npip install arviz\n\n\nA Stan program consists of function definitions, variable declarations and statements, organised into {...} delimited blocks, e.g.\ndata {\n  real y;  # a variable declaration\n}\nmodel {\n  y ~ normal(0, 1.4);  # a statement\n}\nThe purpose of a Stan program is to define the probability density for any combination of data and parameters.\nIt is ok for there to be no parameters:\ntransformed data {\n  real y = 2;  # this is both a statement and a declaration!\n}\nmodel {\n  y ~ normal(0, 1.4);  # the total density is N(2 | 0, 1.4) = 0.103\n}\nor no data:\nparameters {\n  real alpha;\n}\nmodel {\n  alpha ~ normal(0, 1.4);  # Stan can find the density for any alpha\n}\n\n\n\n\n\nUse standard Python tools to make a dictionary mapping data variables to inputs e.g.\nmy_stan_input = {\"y\": 2}\n(Optional) Save the input as a json file:\nimport json\nwith open(\"my_stan_input.json\", \"w\") as f:\n    json.dump(my_stan_input, f)\n\n\n\nInstantiate a CmdstanModel\nfrom cmdstanpy import CmdStanModel\nmy_model = CmdStanModel(stan_file=\"my_stan_program.stan\")\nCmdstanpy will use Stan’s compiler to create .hpp and executable files.\n\n\n\nUse the method CmdStanModel.sample to trigger adaptive HMC.\nmy_mcmc_results = my_model.sample(data=my_stan_input)\n\n\n\nUse the methods CmdStanMCMC.diagnose and CmdStanMCMC.summary for quick diagnostics.\nsummary = my_mcmc_results.summary()\ndiagnostics = my_mcmc_results.diagnose()\n\n\n\nConvert to arviz InferenceData and save\nimport arviz\nmy_idata = arviz.from_cmdstanpy(my_mcmc_results)\nmy_idata.to_json(\"my_arviz_idata.json\")\n\n\n\n\nCmdstanpy docs\nStan reference manual\nStan functions reference\nStan User’s guide\nstan-dev github organisation\n\n\n\nhttps://github.com/abdulfatir/sampling-methods-numpy/blob/master/Metropolis-Hastings.ipynb",
     "crumbs": [
       "Course materials",
-      "What is Bayesian statistical inference?"
-    ]
-  },
-  {
-    "objectID": "week1.html#homework",
-    "href": "week1.html#homework",
-    "title": "What is Bayesian statistical inference?",
-    "section": "Homework",
-    "text": "Homework\n\nThings to read\nBox and Tiao (1992, Ch. 1.1) (available from dtu findit) gives a nice explanation of statistical inference in general and why Bayes.\nHistorical interest:\n\nLaplace (1986) and Stigler (1986)\nJaynes (2003) Preface\n\n\n\nThings to set up\n\nPython\nFirst get a recent (ideally 3.11+) version of Python This can be very annoying so talk to me if necessary!\nNext get used to Python virtual environments.\nThe method I like is to put the virtual environment in a folder .venv inside the root of my project:\n$ python -m venv .venv --prompt=bscb\nThen to use: Tip: use an ergonomic alias to activate venvs e.g. alias va=\"source .venv/bin/activate\"\n$ source .venv/bin/activate\n# ... do work\n$ deactivate\n\n\nGit and ssh\ngit clone git@github.com:teddygroves/bayesian_statistics_for_systems_biologists.git\n\n\nCmdstanpy and cmdstan\nfrom cmdstanpy import CmdStanModel\nfilename = \"example_stan_program.stan\" \ncode = \"data {} parameters {real t;} model {t ~ std_normal();}\"\nwith open(filename, \"w\") as f:\n    f.write(code)\nmodel = CmdStanModel(stan_file=filename)\nmcmc = model.sample()",
-    "crumbs": [
-      "Course materials",
-      "What is Bayesian statistical inference?"
+      "MCMC and Stan"
     ]
   },
   {
@@ -96,6 +85,116 @@
     "crumbs": [
       "Admin",
       "Welcome!"
+    ]
+  },
+  {
+    "objectID": "week1.html",
+    "href": "week1.html",
+    "title": "Bayesian statistical inference",
+    "section": "",
+    "text": "What is Bayesian statistical inference?\nWhy is it useful?\nThe big challenge\n\n\n\n\nSet up git/ssh, Python, cmdstanpy and cmdstan",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#introduction",
+    "href": "week1.html#introduction",
+    "title": "Bayesian statistical inference",
+    "section": "",
+    "text": "What is Bayesian statistical inference?\nWhy is it useful?\nThe big challenge\n\n\n\n\nSet up git/ssh, Python, cmdstanpy and cmdstan",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#probability-function",
+    "href": "week1.html#probability-function",
+    "title": "Bayesian statistical inference",
+    "section": "Probability function",
+    "text": "Probability function\n\n\n\n\n\n\nFigure 1: A jug of water\n\n\n\nA function that can measure the water in a jug.\ni.e.\n\\(p: S \\rightarrow [0,1]\\) where\n\n\\(S\\) is an event space\nIf \\(A, B \\in S\\) are disjoint, then \\(p(A\\cup B) = p(A) + p(B)\\)",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#bayesian-epistemology",
+    "href": "week1.html#bayesian-epistemology",
+    "title": "Bayesian statistical inference",
+    "section": "Bayesian epistemology",
+    "text": "Bayesian epistemology\nProbability functions can (sometimes…) describe belief/information. E.g.\n“Definitely B”:\n\n“Not sure if A or B”:\n\n“B a bit more plausible than A”:",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#statistical-inference",
+    "href": "week1.html#statistical-inference",
+    "title": "Bayesian statistical inference",
+    "section": "Statistical Inference",
+    "text": "Statistical Inference\n\n\n\n\n\n\nFigure 2: A nice soup: here is the recipe\n\n\n\nIn: facts about a spoonful sample\nOut: propositions about a soup population\ne.g.\n\nspoonful not salty \\(\\rightarrow\\) soup not salty\nno carrots in spoon \\(\\rightarrow\\) no carrots in soup\n\n\nBayesian statistical inference\n\n\n\n\n\n\nFigure 3: A jug of soup\n\n\n\nStatistical inference resulting in a probability.\ne.g.\n\nspoon \\(\\rightarrow\\) \\(p(\\text{soup not salty})\\) = 99.9%\nspoon \\(\\rightarrow\\) \\(p(\\text{no carrots in soup})\\) = 95.1%\n\nNon-Bayesian inferences:\n\nspoon \\(\\rightarrow\\) Best estimate of [salt] is 0.1mol/l\n\\(p_{null}(\\text{spoon})\\) = 4.9% \\(\\rightarrow\\) no carrots (p=0.049)",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#general-reasons",
+    "href": "week1.html#general-reasons",
+    "title": "Bayesian statistical inference",
+    "section": "General reasons",
+    "text": "General reasons\n\nEasy to interpret\n\n\n\n\n\n\nFigure 4: It’s a good book!\n\n\n\nBayesian inference produces probabilities, which can be interpreted in terms of information and plausible reasoning.\ne.g. “According to the model…”\n\n“…x is highly plausible.”\n“…x is more plausible than y.”\n“…the data doesn’t contain enough information for firm conclusions about x.”\n\n\n\nOld\n\n\n\n\n\n\n(https://en.wikipedia.org/wiki/Pierre-Simon_Laplace)\n\n\n\n\nFigure 5: Laplace, who did Bayesian inference in the 1780s\n\n\n\nBayesian inference is old!\nThis means\n\nit is well understood mathematically.\nconceptual surprises are relatively rare.\nthere are many compatible frameworks.\n\n\n\nAn easy way to represent your information\nProbabilities decompose nicely:\n\\[\np(\\theta, y) = p(\\theta)p(y\\mid\\hat{y}(\\theta))\n\\]\n\n\\(p(\\theta)\\): nice form for background information, e.g. anything non-experimental\n\\(\\hat{y}(\\theta)\\): nice form for structural information, e.g. physical laws\n\\(p(y\\mid\\hat{y}(\\theta))\\): nice form for measurement information, e.g. instrument accuracy",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#reasons-specific-to-computational-biology",
+    "href": "week1.html#reasons-specific-to-computational-biology",
+    "title": "Bayesian statistical inference",
+    "section": "Reasons specific to computational biology",
+    "text": "Reasons specific to computational biology\n\nRegression models: good for describing measurements\nIdea: measured value systematically but noisily depends on the true value e.g.\n\\(y \\sim N(\\hat{y}, \\sigma)\\)\nBayesian inference lends itself to regression models that accurately describe details of the measurement process. e.g.\n\nheteroskedasticity \\(y \\sim N(\\hat{y}, \\sigma(\\hat{y}))\\)\nnon-negativity \\(y \\sim LN(\\ln{\\hat{y}}, \\sigma)\\) (also compositionality)\nunknown bias \\(y \\sim N(\\hat{y} + q, \\sigma)\\)\n\n\n\nMulti-level models: good for describing sources of variation\n\n\n\n\n\n\nFigure 6: plot from https://github.com/teddygroves/baseball\n\n\n\nMeasurement model:\n\\(y \\sim binomial(K, logit(ability))\\)\nGpareto model:\n\\(ability \\sim GPareto(m, k, s)\\)\nNormal model:\n\\(ability \\sim N(\\mu, \\tau)\\)\n\n\nGenerative models: good for representing structural information\n\n\n\n\n\n\nFigure 7: From a Stan case study\n\n\n\nInformation about hares (\\(u\\)) and lynxes (\\(v\\)):\n\\[\\begin{align*}\n\\frac{d}{dt}u &= (\\alpha - \\beta v)u \\\\\n\\frac{d}{dt}v &= (-\\gamma + \\delta u)v\n\\end{align*}\\]\ni.e. a deterministic function turning \\(\\alpha\\), \\(\\beta\\), \\(\\gamma\\), \\(\\delta\\), \\(u(0)\\) and \\(v(0)\\) into \\(u(t)\\) and \\(v(t)\\).",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#the-solution-mcmc",
+    "href": "week1.html#the-solution-mcmc",
+    "title": "Bayesian statistical inference",
+    "section": "The solution: MCMC",
+    "text": "The solution: MCMC\n\n\n\n\n\n\nFigure 8: An image I found online\n\n\n\nStrategy:\n\nFind a series of numbers that\n\nquickly finds the high-probabiliy region in parameter space\nreliably matches its statistical properties\n\nDo sample-based approximate integration.\n\nIt (often) works!\nWe can tell when it doesn’t work!",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#things-to-read",
+    "href": "week1.html#things-to-read",
+    "title": "Bayesian statistical inference",
+    "section": "Things to read",
+    "text": "Things to read\nBox and Tiao (1992, Ch. 1.1) (available from dtu findit) gives a nice explanation of statistical inference in general and why Bayes.\nHistorical interest:\n\nLaplace (1986) and Stigler (1986)\nJaynes (2003) Preface",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#things-to-set-up",
+    "href": "week1.html#things-to-set-up",
+    "title": "Bayesian statistical inference",
+    "section": "Things to set up",
+    "text": "Things to set up\n\nPython\nFirst get a recent (ideally 3.11+) version of Python This can be very annoying so talk to me if necessary!\nNext get used to Python virtual environments.\nThe method I like is to put the virtual environment in a folder .venv inside the root of my project:\n$ python -m venv .venv --prompt=bscb\nThen to use: Tip: use an ergonomic alias to activate venvs e.g. alias va=\"source .venv/bin/activate\"\n$ source .venv/bin/activate\n# ... do work\n$ deactivate\n\n\nGit and ssh\ngit clone git@github.com:teddygroves/bayesian_statistics_for_systems_biologists.git\n\n\nCmdstanpy and cmdstan\nfrom cmdstanpy import CmdStanModel\nfilename = \"example_stan_program.stan\" \ncode = \"data {} parameters {real t;} model {t ~ std_normal();}\"\nwith open(filename, \"w\") as f:\n    f.write(code)\nmodel = CmdStanModel(stan_file=filename)\nmcmc = model.sample()",
+    "crumbs": [
+      "Course materials",
+      "Bayesian statistical inference"
     ]
   }
 ]

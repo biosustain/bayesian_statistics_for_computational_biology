@@ -1,20 +1,19 @@
-# What is Bayesian statistical inference?
+# Bayesian statistical inference
 ## Introduction
 
 ### Today's topics
 
 1. [What is Bayesian statistical inference?](#what-is-bayesian-statistical-inference)
-2. [Why is it useful in general?](#why-is-bayesian-statistical-inference-useful-in-general)
-3. [Why is it useful in systems biology?](#why-is-bayesian-inference-useful-in-systems-biology)
-4. [The big challenge](#the-big-challenge)
+2. [Why is it useful?](#why-is-bayesian-statistical-inference-useful)
+3. [The big challenge](#the-big-challenge)
 
 ### Computer goals
 
 Set up git/ssh, Python, cmdstanpy and cmdstan
 
-## What is Bayesian statistical inference?
+# What is Bayesian statistical inference?
 
-### Probability function
+## Probability function
 :::{#fig-jug}
 ![](img/jug.jpg)
 
@@ -30,7 +29,7 @@ $p: S \rightarrow [0,1]$ where
 - $S$ is an [event space](https://en.wikipedia.org/wiki/Event_(probability_theory)#Events_in_probability_spaces) 
 - If $A, B \in S$ are disjoint, then $p(A\cup B) = p(A) + p(B)$
 
-### Bayesian epistemology
+## Bayesian epistemology
 
 Probability functions can (sometimes...) describe belief/information. E.g.
 
@@ -46,7 +45,7 @@ Probability functions can (sometimes...) describe belief/information. E.g.
 
 ![](img/probably_b.jpg){width=50%}
 
-### Statistical Inference
+## Statistical Inference
 
 ::: {#fig-soup}
 ![](img/soup.jpg)
@@ -87,9 +86,11 @@ Non-Bayesian inferences:
 - $p_{null}(\text{spoon})$ = 4.9% $\rightarrow$ no carrots (p=0.049)
 
 
-# Why is Bayesian statistical inference useful in general?
+# Why is Bayesian statistical inference useful?
 
-### Philosophical reason
+## General reasons
+
+### Easy to interpret
 
 ::: {#fig-jaynes width="40%"}
 
@@ -109,7 +110,7 @@ e.g. "According to the model..."
 * "...the data doesn't contain enough information for firm conclusions about x."
 
 
-### Mathematical reason
+### Old
 ::: {#fig-laplace width="40%"}
 
 [![(https://en.wikipedia.org/wiki/Pierre-Simon_Laplace)](img/laplace.jpg)](https://en.wikipedia.org/wiki/Pierre-Simon_Laplace){height=80%}
@@ -126,7 +127,7 @@ This means
 * conceptual surprises are relatively rare.
 * there are many compatible frameworks.
 
-### General practical reason
+### An easy way to represent your information
 
 Probabilities decompose nicely:
 
@@ -138,7 +139,7 @@ $$
 - $\hat{y}(\theta)$: nice form for *structural* information, e.g. physical laws
 - $p(y\mid\hat{y}(\theta))$: nice form for *measurement* information, e.g. instrument accuracy
 
-## Why is Bayesian inference useful in systems biology?
+## Reasons specific to computational biology
 
 ### Regression models: good for describing measurements
 
@@ -192,9 +193,7 @@ Information about hares ($u$) and lynxes ($v$):
 i.e. a deterministic function turning $\alpha$, $\beta$, $\gamma$, $\delta$,
 $u(0)$ and $v(0)$ into $u(t)$ and $v(t)$.
 
-## The big challenge
-
-### The big challenge
+# The big challenge
 
 $p(\theta \mid y)$ is easy to evaluate but hard to integrate.
 
@@ -212,7 +211,7 @@ $$
 
 $p(\theta \mid y)$ has one dimension per model parameter.
 
-### The solution: MCMC
+## The solution: MCMC
 
 ::: {#fig-mcmc}
 ![](img/mcmc.png): 
@@ -233,9 +232,9 @@ It (often) works!
 
 We can tell when it doesn't work!
 
-## Homework 
+# Homework 
 
-### Things to read
+## Things to read
 
 @boxBayesianInferenceStatistical1992 [Ch. 1.1] (available from dtu findit) gives a
 nice explanation of statistical inference in general and why Bayes.
@@ -245,9 +244,9 @@ Historical interest:
 - @laplaceMemoirProbabilityCauses1986 and @stiglerLaplace1774Memoir1986 
 - @jaynesProbabilityTheoryLogic2003 Preface
 
-### Things to set up
+## Things to set up
 
-#### Python
+### Python
 
 First get a recent (ideally 3.11+) version of Python This can be very annoying so talk to me if necessary!
 
@@ -267,13 +266,13 @@ $ source .venv/bin/activate
 $ deactivate
 ```
 
-#### Git and ssh
+### Git and ssh
 
 ```shell
 git clone git@github.com:teddygroves/bayesian_statistics_for_systems_biologists.git
 ```
 
-#### Cmdstanpy and cmdstan
+### Cmdstanpy and cmdstan
 
 ```python
 from cmdstanpy import CmdStanModel
