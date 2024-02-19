@@ -1,4 +1,12 @@
-# Bayesian statistical inference
+---
+format:
+  revealjs:
+    toc: false
+    smaller: true
+    scrollable: true
+    slide-level: 3
+---
+# Introduction to Bayesian inference
 ## Introduction
 
 ### Today's topics
@@ -31,19 +39,35 @@ $p: S \rightarrow [0,1]$ where
 
 ## Bayesian epistemology
 
-Probability functions can (sometimes...) describe belief/information. E.g.
+Probability functions can describe belief, e.g.
+
+::::{.columns}
+
+:::{.column}
 
 "Definitely B":
 
-![](img/definitely_b.jpg){width=50%}
+![](img/definitely_b.jpg){width=35%}
+
+:::
+
+:::{.column}
 
 "Not sure if A or B":
 
-![](img/not_sure.jpg){width=50%}
+![](img/not_sure.jpg){width=35%}
+
+:::
+
+:::{.column}
 
 "B a bit more plausible than A":
 
-![](img/probably_b.jpg){width=50%}
+![](img/probably_b.jpg){width=35%}
+
+:::
+
+::::
 
 ## Statistical Inference
 
@@ -64,7 +88,7 @@ e.g.
 - no carrots in spoon $\rightarrow$ no carrots in soup
 
 
-### Bayesian statistical inference
+## Bayesian statistical inference
 :::{#fig-soup-jug}
 
 ![](img/soup_with_jug.jpg){width=50%}
@@ -143,16 +167,15 @@ $$
 
 ### Regression models: good for describing measurements
 
-Idea: measured value systematically but noisily depends on the true value e.g.
+Regression: measured value noisily depends on the true value e.g. $y \sim N(\hat{y}, \sigma)$.
 
-$y \sim N(\hat{y}, \sigma)$
+Biology experiments often have measurement processes with awkward features. e.g.
 
-Bayesian inference lends itself to regression models that accurately describe
-details of the measurement process. e.g.
+- heteroskedasticity (amount of noise depends on measured value)
+- constraints (e.g. non-negativity, compositionality)
+- unknown latent bias (e.g. the pump is supposed to add $0.05cm^3$ per min, but does it?) 
 
-- heteroskedasticity $y \sim N(\hat{y}, \sigma(\hat{y}))$
-- non-negativity $y \sim LN(\ln{\hat{y}}, \sigma)$ (also compositionality)
-- unknown bias $y \sim N(\hat{y} + q, \sigma)$
+Bayesian inference is good at describing these.
 
 ### Multi-level models: good for describing sources of variation
 
@@ -285,7 +308,7 @@ mcmc = model.sample()
 ```
 
 # Next time
-#### Theory
+## Theory
 
 Hamiltonian Monte Carlo:
 
@@ -294,7 +317,7 @@ Hamiltonian Monte Carlo:
 
 MCMC diagnostics
 
-#### Computer
+## Computer
 
 Stan, cmdstanpy, arviz:
 

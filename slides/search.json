@@ -1,0 +1,134 @@
+[
+  {
+    "objectID": "week1.html#introduction",
+    "href": "week1.html#introduction",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#probability-function",
+    "href": "week1.html#probability-function",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Probability function",
+    "text": "Probability function\n\n\nFigure 1: A jug of water\nA function that can measure the water in a jug.\ni.e.\n\\(p: S \\rightarrow [0,1]\\) where\n\n\\(S\\) is an event space\nIf \\(A, B \\in S\\) are disjoint, then \\(p(A\\cup B) = p(A) + p(B)\\)",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#bayesian-epistemology",
+    "href": "week1.html#bayesian-epistemology",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Bayesian epistemology",
+    "text": "Bayesian epistemology\nProbability functions can describe belief, e.g.\n\n\n“Definitely B”:\n\n\n“Not sure if A or B”:\n\n\n“B a bit more plausible than A”:",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#statistical-inference",
+    "href": "week1.html#statistical-inference",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Statistical Inference",
+    "text": "Statistical Inference\n\n\nFigure 2: A nice soup: here is the recipe\nIn: facts about a spoonful sample\nOut: propositions about a soup population\ne.g.\n\nspoonful not salty \\(\\rightarrow\\) soup not salty\nno carrots in spoon \\(\\rightarrow\\) no carrots in soup",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#bayesian-statistical-inference",
+    "href": "week1.html#bayesian-statistical-inference",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Bayesian statistical inference",
+    "text": "Bayesian statistical inference\n\n\nFigure 3: A jug of soup\nStatistical inference resulting in a probability.\ne.g.\n\nspoon \\(\\rightarrow\\) \\(p(\\text{soup not salty})\\) = 99.9%\nspoon \\(\\rightarrow\\) \\(p(\\text{no carrots in soup})\\) = 95.1%\n\nNon-Bayesian inferences:\n\nspoon \\(\\rightarrow\\) Best estimate of [salt] is 0.1mol/l\n\\(p_{null}(\\text{spoon})\\) = 4.9% \\(\\rightarrow\\) no carrots (p=0.049)",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#general-reasons",
+    "href": "week1.html#general-reasons",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "General reasons",
+    "text": "General reasons",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#reasons-specific-to-computational-biology",
+    "href": "week1.html#reasons-specific-to-computational-biology",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Reasons specific to computational biology",
+    "text": "Reasons specific to computational biology",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#the-solution-mcmc",
+    "href": "week1.html#the-solution-mcmc",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "The solution: MCMC",
+    "text": "The solution: MCMC\n\n\nFigure 8: An image I found online\nStrategy:\n\nFind a series of numbers that\n\nquickly finds the high-probabiliy region in parameter space\nreliably matches its statistical properties\n\nDo sample-based approximate integration.\n\nIt (often) works!\nWe can tell when it doesn’t work!",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#things-to-read",
+    "href": "week1.html#things-to-read",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Things to read",
+    "text": "Things to read\nBox and Tiao (1992, Ch. 1.1) (available from dtu findit) gives a nice explanation of statistical inference in general and why Bayes.\nHistorical interest:\n\nLaplace (1986) and Stigler (1986)\nJaynes (2003) Preface",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#things-to-set-up",
+    "href": "week1.html#things-to-set-up",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Things to set up",
+    "text": "Things to set up",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#theory",
+    "href": "week1.html#theory",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Theory",
+    "text": "Theory\nHamiltonian Monte Carlo:\n\nwhat?\nwhy?\n\nMCMC diagnostics",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  },
+  {
+    "objectID": "week1.html#computer",
+    "href": "week1.html#computer",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Computer",
+    "text": "Computer\nStan, cmdstanpy, arviz:\n\nformats\nworkflow\nwrite a model",
+    "crumbs": [
+      "Course materials",
+      "Introduction to Bayesian inference"
+    ]
+  }
+]
