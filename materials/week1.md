@@ -289,6 +289,15 @@ git clone git@github.com:teddygroves/bayesian_statistics_for_systems_biologists.
 
 ### Cmdstanpy and cmdstan
 
+First install them:
+
+```shell
+$ pip install cmdstanpy
+$ python -m cmdstanpy.instsall_cmdstan
+```
+
+Now test if they work
+
 ```python
 from cmdstanpy import CmdStanModel
 filename = "example_stan_program.stan" 
