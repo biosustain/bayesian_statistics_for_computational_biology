@@ -100,7 +100,7 @@ Illustration:
 [A better illustration](http://chi-feng.github.io/mcmc-demo/app.html?algorithm=HamiltonianMC&target=banana)
 
 
-{.callout-note}
+:::{.callout-note}
 ### A small but important detail:
 
 To decide how hard to flick the ball and how precisely to calculate its trajectory for a particular case, **adaptation** is required, i.e. running the algorithm in warm-up mode for a bit and learning by trial and error. How best to do adaptation is an important open question.
@@ -119,6 +119,8 @@ Limitations:
 @betancourtConvergenceMarkovChain2018
 
 @beskosOptimalTuningHybrid2010
+
+@andrieuIntroductionMCMCMachine
 
 ## Stan
 
@@ -285,5 +287,14 @@ my_idata.to_json("my_arviz_idata.json")
 [stan-dev github organisation](https://github.com/stan-dev/)
 
 
-### How to Program your own mcmc!
-<https://github.com/abdulfatir/sampling-methods-numpy/blob/master/Metropolis-Hastings.ipynb>
+# Next time / homework
+
+- How to Program your own mcmc!
+
+- I ran MCMC, now what??
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+

@@ -35,4 +35,9 @@ format:
     theme: cosmo
     embed-resources: true
     include-in-header: mathjax.html
-
+  # revealjs:
+  #   embed-resources: true
+  #   include-in-header: mathjax.html
+  #   slide-level: 4
+  #   smaller: true
+  #   scrollable: true

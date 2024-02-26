@@ -1,5 +1,71 @@
 [
   {
+    "objectID": "week2.html#introduction",
+    "href": "week2.html#introduction",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Introduction",
+    "text": "Introduction\nWelcome back!\nPlan for today:\n\nMCMC\nGetting started with Stan in Python\n\nRecap from last week:\nBayesian inference: Statistical inference resulting in probabilities\nWhy in general? Probability is expressive, old and decomposes nicely\nWhy in biology? Hierarchical regression models with ODEs\nThe big challenge Integrating high dimensional probability functions",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "week2.html#mcmc",
+    "href": "week2.html#mcmc",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "MCMC",
+    "text": "MCMC",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "week2.html#stan",
+    "href": "week2.html#stan",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Stan",
+    "text": "Stan\nStan is:\n\nA language for specifying probability density functions as Stan programs.\nA compiler that turns Stan programs into instructions for inference engines.\nAn inference engine implementing adaptive HMC and some other algorithms.\nA library of functions for calculating the gradients of interesting probability density functions.\nSome interfaces for popular computer tools:\n\nCommand line: cmdstan\nPython:\n\ncmdstanpy\npystan\n\nR:\n\ncmdstanr\nRstan",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "week2.html#getting-started-with-stan-in-python",
+    "href": "week2.html#getting-started-with-stan-in-python",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Getting started with Stan in Python",
+    "text": "Getting started with Stan in Python\nInstall cmdstanpy\npip install cmdstanpy\nUse cmdstanpy to install the rest of Stan\npython -m cmdstanpy.install_cmdstan --cores 2\nI like to store Stan outputs using the library arviz. It also makes nice plots.\npip install arviz",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "index.html#general-format",
+    "href": "index.html#general-format",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "General format",
+    "text": "General format\nEach week we have a one-hour seminar. The goal is to spend the time approximately as follows:\n\n25-35mins on ‘theory’, aka learning things from the book and getting more reading material\n25-35mins on practical computer work",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  },
+  {
+    "objectID": "index.html#plan",
+    "href": "index.html#plan",
+    "title": "Bayesian Statistics for Computational Biology",
+    "section": "Plan",
+    "text": "Plan",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  },
+  {
     "objectID": "week1.html#introduction",
     "href": "week1.html#introduction",
     "title": "Bayesian Statistics for Computational Biology",
