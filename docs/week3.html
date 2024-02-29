@@ -4651,6 +4651,49 @@ MathJax.Hub.Config({
   };
 </script>
 
+  <script>/*
+ * Polyfill service v3.111.0
+ * Disable minification (remove `.min` from URL path) for more info
+*/
+
+</script>
+  
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -4676,7 +4719,7 @@ MathJax.Hub.Config({
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Admin</a></li><li class="breadcrumb-item"><a href="./index.html">Welcome!</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1.html">Course materials</a></li><li class="breadcrumb-item"><a href="./week3.html">What to do after MCMC</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -4699,7 +4742,7 @@ MathJax.Hub.Config({
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Welcome!</span></a>
   </div>
 </li>
@@ -4728,8 +4771,8 @@ MathJax.Hub.Config({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Sampling is done: what now??</span></a>
+  <a href="./week3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">What to do after MCMC</span></a>
   </div>
 </li>
       </ul>
@@ -4744,21 +4787,18 @@ MathJax.Hub.Config({
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#welcome" id="toc-welcome" class="nav-link active" data-scroll-target="#welcome">Welcome!</a>
+  <li><a href="#what-to-do-after-mcmc" id="toc-what-to-do-after-mcmc" class="nav-link active" data-scroll-target="#what-to-do-after-mcmc">What to do after MCMC</a></li>
+  <li><a href="#mcmc-diagnostics" id="toc-mcmc-diagnostics" class="nav-link" data-scroll-target="#mcmc-diagnostics">MCMC diagnostics</a>
   <ul class="collapse">
-  <li><a href="#general-format" id="toc-general-format" class="nav-link" data-scroll-target="#general-format">General format</a></li>
-  <li><a href="#plan" id="toc-plan" class="nav-link" data-scroll-target="#plan">Plan</a>
+  <li><a href="#hatr" id="toc-hatr" class="nav-link" data-scroll-target="#hatr"><span class="math inline">\(\hat{R}\)</span></a></li>
+  <li><a href="#divergent-transitions" id="toc-divergent-transitions" class="nav-link" data-scroll-target="#divergent-transitions">Divergent transitions</a></li>
+  </ul></li>
+  <li><a href="#model-evaluation" id="toc-model-evaluation" class="nav-link" data-scroll-target="#model-evaluation">Model evaluation</a>
   <ul class="collapse">
-  <li><a href="#week-1-what-is-bayesian-inference" id="toc-week-1-what-is-bayesian-inference" class="nav-link" data-scroll-target="#week-1-what-is-bayesian-inference">Week 1: What is Bayesian inference?</a></li>
-  <li><a href="#week-2-mcmc" id="toc-week-2-mcmc" class="nav-link" data-scroll-target="#week-2-mcmc">Week 2: MCMC</a></li>
-  <li><a href="#week-3-after-mcmc-diagnostics-and-decisions" id="toc-week-3-after-mcmc-diagnostics-and-decisions" class="nav-link" data-scroll-target="#week-3-after-mcmc-diagnostics-and-decisions">Week 3: After MCMC: diagnostics, and decisions</a></li>
-  <li><a href="#week-4-bayesian-workflow" id="toc-week-4-bayesian-workflow" class="nav-link" data-scroll-target="#week-4-bayesian-workflow">Week 4: Bayesian workflow</a></li>
-  <li><a href="#week-5-regression-models-in-biology" id="toc-week-5-regression-models-in-biology" class="nav-link" data-scroll-target="#week-5-regression-models-in-biology">Week 5: Regression models in biology</a></li>
-  <li><a href="#week-6-odes" id="toc-week-6-odes" class="nav-link" data-scroll-target="#week-6-odes">Week 6: ODEs</a></li>
-  <li><a href="#week-7-case-study-a-large-biological-analysis" id="toc-week-7-case-study-a-large-biological-analysis" class="nav-link" data-scroll-target="#week-7-case-study-a-large-biological-analysis">Week 7: Case study: a large biological analysis</a></li>
-  <li><a href="#week-8-10-project" id="toc-week-8-10-project" class="nav-link" data-scroll-target="#week-8-10-project">Week 8-10: Project</a></li>
+  <li><a href="#very-quick-decision-theory" id="toc-very-quick-decision-theory" class="nav-link" data-scroll-target="#very-quick-decision-theory">Very quick decision theory</a></li>
+  <li><a href="#log-likelihood" id="toc-log-likelihood" class="nav-link" data-scroll-target="#log-likelihood">Log likelihood</a></li>
   </ul></li>
-  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   </ul>
 </nav>
     </div>
@@ -4768,180 +4808,153 @@ MathJax.Hub.Config({
 
 
 
-<section id="welcome" class="level1">
-<h1>Welcome!</h1>
-<p>This is a course about Bayesian statistics, targeted at systems biologists.</p>
-<p>There are three intended learning outcomes:</p>
-<ol type="1">
-<li><p>Understand the theoretical basis for applying Bayesian data analysis to practical scientific problems</p></li>
-<li><p>Develop a familiarity with implementing Bayesian data analysis using modern software tools</p></li>
-<li><p>Gain deep understanding of both theory and practice of elements of Bayesian data analysis that are particularly relevant to computational biology, including custom hierarchical models, large analyses and statistical models with embedded ODE systems.</p></li>
-</ol>
-<section id="general-format" class="level2">
-<h2 class="anchored" data-anchor-id="general-format">General format</h2>
-<p>Each week we have a one-hour seminar. The goal is to spend the time approximately as follows:</p>
-<ol type="1">
-<li><p>25-35mins on ‘theory’, aka learning things from the book and getting more reading material</p></li>
-<li><p>25-35mins on practical computer work</p></li>
-</ol>
+<section id="what-to-do-after-mcmc" class="level1">
+<h1>What to do after MCMC</h1>
+<p>Plan for today:</p>
+<ul>
+<li>After MCMC: <a href="#mcmc-diagnostics">diagnostics</a>, <a href="#model-evaluation">model evaluation</a>, <a href="#Results">results</a></li>
+<li>Code your own Metropolis-Hastings sampler</li>
+</ul>
+<p>Recap from last week:</p>
+<p><strong><a href="./week2.html#MCMC">MCMC</a></strong>: Monte Carlo Integration using Markov Chains</p>
+<p><strong><a href="./week2.html#Stan">Stan</a></strong>: A probabilistic programming framework</p>
 </section>
-<section id="plan" class="level2">
-<h2 class="anchored" data-anchor-id="plan">Plan</h2>
-<section id="week-1-what-is-bayesian-inference" class="level3">
-<h3 class="anchored" data-anchor-id="week-1-what-is-bayesian-inference">Week 1: <a href="./week1.html">What is Bayesian inference?</a></h3>
-<section id="theory" class="level4">
-<h4 class="anchored" data-anchor-id="theory">Theory</h4>
-<p>Statistical inference in general</p>
-<p>Bayesian statistical inference</p>
-<p>The big challenge: dimensionality</p>
+<section id="mcmc-diagnostics" class="level1">
+<h1>MCMC diagnostics</h1>
+<p>Overall aim: do my samples really come from my target probability distribution?</p>
+<p>General rules of thumb:</p>
+<ul>
+<li>Run plenty of chains</li>
+<li>Adopt a pessimistic mindset: one bad diagnostic is enough!</li>
+</ul>
+<section id="hatr" class="level2">
+<h2 class="anchored" data-anchor-id="hatr"><span class="math inline">\(\hat{R}\)</span></h2>
+<p><span class="math inline">\(\hat{R}\)</span> is a number that tells you:</p>
+<ul>
+<li>Do my chains agree with each other?</li>
+<li>Are my chains stationary?</li>
+</ul>
+<p><span class="math inline">\(\hat{R}\)</span> should be close to 1. If not, you need to change something!</p>
+<p>Find out more: <span class="citation" data-cites="vehtariRankNormalizationFoldingLocalization2021">Vehtari et al. (<a href="#ref-vehtariRankNormalizationFoldingLocalization2021" role="doc-biblioref">2021</a>)</span></p>
 </section>
-<section id="practice" class="level4">
-<h4 class="anchored" data-anchor-id="practice">Practice</h4>
-<p>Set up development environment</p>
-<p>git basics</p>
-<p>Install Stan and cmdstanpy</p>
-</section>
-<section id="reading" class="level4">
-<h4 class="anchored" data-anchor-id="reading">Reading</h4>
-<p><span class="citation" data-cites="jaynesProbabilityTheoryLogic2003">Jaynes (<a href="#ref-jaynesProbabilityTheoryLogic2003" role="doc-biblioref">2003</a>, Ch. 1)</span></p>
-<p><span class="citation" data-cites="laplaceMemoirProbabilityCauses1986">Laplace (<a href="#ref-laplaceMemoirProbabilityCauses1986" role="doc-biblioref">1986</a>)</span></p>
-<p><span class="citation" data-cites="boxBayesianInferenceStatistical1992">Box and Tiao (<a href="#ref-boxBayesianInferenceStatistical1992" role="doc-biblioref">1992</a>, Ch. 1.1)</span></p>
+<section id="divergent-transitions" class="level2">
+<h2 class="anchored" data-anchor-id="divergent-transitions">Divergent transitions</h2>
+<p>This diagnostic is specific to HMC.</p>
+<p>It answers the question <em>did the trajectory ODE solver fail?</em></p>
+<p>Usually the reason for the failure is a target distribution with very varying optimal step sizes.</p>
+<p>Sometimes the location of the divergent transitions gives clues about the reason for the failure.</p>
+<p>Find out more: <a href="https://betanalpha.github.io/assets/case_studies/divergences_and_bias.html"><span class="citation" data-cites="betancourtDiagnosingBiasedInference2017">Betancourt (<span>2017</span>)</span></a>.</p>
 </section>
 </section>
-<section id="week-2-mcmc" class="level3">
-<h3 class="anchored" data-anchor-id="week-2-mcmc">Week 2: MCMC</h3>
-<section id="theory-1" class="level4">
-<h4 class="anchored" data-anchor-id="theory-1">Theory</h4>
-<p>What is MCMC?</p>
-<p>Hamiltonian Monte Carlo</p>
-<p>Probabilistic programming</p>
+<section id="model-evaluation" class="level1">
+<h1>Model evaluation</h1>
+<section id="very-quick-decision-theory" class="level2">
+<h2 class="anchored" data-anchor-id="very-quick-decision-theory">Very quick decision theory</h2>
+<p><strong>Loss function</strong>: If the observation is <span class="math inline">\(y\)</span> and the model says <span class="math inline">\(p(y) = z\)</span>, how bad is that?</p>
+<p>To choose a model, choose a loss function, then try to minimise estimated expected loss.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Which loss function is best depends on the problem!</p>
+</div>
+</div>
+<p>To estimate expected loss, make some predictions.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In order to be useful for estimating model performance, predictions must be relevant to the evaluation context that matters.</p>
+<p>i.e. not from the training data, not from an already-observed sample, not from the past, etc…</p>
+</div>
+</div>
+<p>Find out more: <span class="citation" data-cites="vehtariSurveyBayesianPredictive2012">Vehtari and Ojanen (<a href="#ref-vehtariSurveyBayesianPredictive2012" role="doc-biblioref">2012</a>)</span></p>
 </section>
-<section id="practice-1" class="level4">
-<h4 class="anchored" data-anchor-id="practice-1">Practice</h4>
-<p>Run an MCMC algorithm and inspect the results</p>
-</section>
-<section id="reading-1" class="level4">
-<h4 class="anchored" data-anchor-id="reading-1">Reading</h4>
-<p><span class="citation" data-cites="betancourtConceptualIntroductionHamiltonian2018">Betancourt (<a href="#ref-betancourtConceptualIntroductionHamiltonian2018" role="doc-biblioref">2018</a>)</span></p>
-</section>
-</section>
-<section id="week-3-after-mcmc-diagnostics-and-decisions" class="level3">
-<h3 class="anchored" data-anchor-id="week-3-after-mcmc-diagnostics-and-decisions">Week 3: After MCMC: diagnostics, and decisions</h3>
-<section id="theory-2" class="level4">
-<h4 class="anchored" data-anchor-id="theory-2">Theory</h4>
-<p>Diagnostics: convergence, divergent transitions, effective sample size</p>
-<p>Model evaluation as decision theory</p>
-<p>Why negative log likelihood is a good default loss function</p>
-</section>
-<section id="practice-2" class="level4">
-<h4 class="anchored" data-anchor-id="practice-2">Practice</h4>
-<p>Diagnose some good and bad MCMC runs</p>
-</section>
-<section id="reading-2" class="level4">
-<h4 class="anchored" data-anchor-id="reading-2">Reading</h4>
-<p><span class="citation" data-cites="vehtariRankNormalizationFoldingLocalization2021">Vehtari et al. (<a href="#ref-vehtariRankNormalizationFoldingLocalization2021" role="doc-biblioref">2021</a>)</span></p>
-<p><span class="citation" data-cites="vehtariPracticalBayesianModel2017">Vehtari, Gelman, and Gabry (<a href="#ref-vehtariPracticalBayesianModel2017" role="doc-biblioref">2017</a>)</span></p>
-</section>
-</section>
-<section id="week-4-bayesian-workflow" class="level3">
-<h3 class="anchored" data-anchor-id="week-4-bayesian-workflow">Week 4: Bayesian workflow</h3>
-<section id="theory-3" class="level4">
-<h4 class="anchored" data-anchor-id="theory-3">Theory</h4>
-<p>Parts of a statistical anlaysis (not just inference!)</p>
-<p>Why Bayesian workflow is complex: non-linearity and plurality</p>
-<p>Writing scalable statistical programming projects</p>
-</section>
-<section id="practice-3" class="level4">
-<h4 class="anchored" data-anchor-id="practice-3">Practice</h4>
-<p>Write a scalable statistical analysis with <a href="https://docs.readthedocs.io/en/stable/config-file/v2.html">bibat</a>.</p>
-</section>
-<section id="reading-3" class="level4">
-<h4 class="anchored" data-anchor-id="reading-3">Reading</h4>
-<p><span class="citation" data-cites="gelmanBayesianWorkflow2020">Gelman et al. (<a href="#ref-gelmanBayesianWorkflow2020" role="doc-biblioref">2020</a>)</span></p>
+<section id="log-likelihood" class="level2">
+<h2 class="anchored" data-anchor-id="log-likelihood">Log likelihood</h2>
+<p>A good default loss function:</p>
+<p><span class="math display">\[
+loss(y, p(y)) = -\ln{p(y)}
+\]</span></p>
+<p>Out of sample log likelihood can often be approximated cheaply: see <span class="citation" data-cites="vehtariPracticalBayesianModel2017">Vehtari, Gelman, and Gabry (<a href="#ref-vehtariPracticalBayesianModel2017" role="doc-biblioref">2017</a>)</span>.</p>
+<p>Find out more: <span class="citation" data-cites="landesObjectiveBayesianismMaximum2013">(<a href="#ref-landesObjectiveBayesianismMaximum2013" role="doc-biblioref">Landes and Williamson 2013, sec. 2.3</a>)</span></p>
 </section>
 </section>
-<section id="week-5-regression-models-in-biology" class="level3">
-<h3 class="anchored" data-anchor-id="week-5-regression-models-in-biology">Week 5: Regression models in biology</h3>
-<section id="theory-4" class="level4">
-<h4 class="anchored" data-anchor-id="theory-4">Theory</h4>
-<p>Generalised linear models</p>
-<p>Prior elicitation</p>
-<p>Hierarchical models</p>
-</section>
-<section id="practice-4" class="level4">
-<h4 class="anchored" data-anchor-id="practice-4">Practice</h4>
-<p>Compare some statistical models of a simulated biological dataset</p>
-</section>
-<section id="reading-4" class="level4">
-<h4 class="anchored" data-anchor-id="reading-4">Reading</h4>
-<p><span class="citation" data-cites="HierarchicalModeling">Betancourt (<a href="#ref-HierarchicalModeling" role="doc-biblioref">2024</a>)</span></p>
-</section>
-</section>
-<section id="week-6-odes" class="level3">
-<h3 class="anchored" data-anchor-id="week-6-odes">Week 6: ODEs</h3>
-<section id="theory-5" class="level4">
-<h4 class="anchored" data-anchor-id="theory-5">Theory</h4>
-<p>What is an ODE?</p>
-<p>ODE solvers</p>
-<p>ODE solvers inside probabilistic programs</p>
-</section>
-<section id="practice-5" class="level4">
-<h4 class="anchored" data-anchor-id="practice-5">Practice</h4>
-<p>Fit a model with an ODE.</p>
-</section>
-<section id="reading-5" class="level4">
-<h4 class="anchored" data-anchor-id="reading-5">Reading</h4>
-<p><span class="citation" data-cites="timonenImportanceSamplingApproach2022">Timonen et al. (<a href="#ref-timonenImportanceSamplingApproach2022" role="doc-biblioref">2022</a>)</span></p>
-</section>
-</section>
-<section id="week-7-case-study-a-large-biological-analysis" class="level3">
-<h3 class="anchored" data-anchor-id="week-7-case-study-a-large-biological-analysis">Week 7: Case study: a large biological analysis</h3>
-<section id="theory-6" class="level4">
-<h4 class="anchored" data-anchor-id="theory-6">Theory</h4>
-<p>Close reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.</p>
-</section>
-<section id="practice-6" class="level4">
-<h4 class="anchored" data-anchor-id="practice-6">Practice</h4>
-<p>Project brainstorm</p>
-</section>
-</section>
-<section id="week-8-10-project" class="level3">
-<h3 class="anchored" data-anchor-id="week-8-10-project">Week 8-10: Project</h3>
-<p>Format: one hour joint feedback and help session</p>
+<section id="results" class="level1">
+<h1>Results</h1>
+<p>Some useful summary statistics:</p>
+<table class="table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 71%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Statistic</th>
+<th>Answers the question</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mean</td>
+<td>“What does the model think is the most likely value”</td>
+</tr>
+<tr class="even">
+<td>Standard deviation</td>
+<td>“How sure is my model about this?”</td>
+</tr>
+<tr class="odd">
+<td>Quantile n</td>
+<td>“What is x s.t. my model is n% sure that the quantity is at least x?”</td>
+</tr>
+</tbody>
+</table>
+<p>Do I have enough samples? To find out, calculate the <a href="https://mc-stan.org/docs/reference-manual/effective-sample-size.html#estimation-of-mcmc-standard-error">Monte Carlo Standard Error</a>.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>MCSE can vary for different statistics relating to the same quantity</p>
+</div>
+</div>
 
 
 
-</section>
-</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-betancourtConceptualIntroductionHamiltonian2018" class="csl-entry" role="listitem">
-Betancourt, Michael. 2018. <span>“A <span>Conceptual Introduction</span> to <span>Hamiltonian Monte Carlo</span>.”</span> <em>arXiv:1701.02434 [Stat]</em>, July. <a href="http://arxiv.org/abs/1701.02434">http://arxiv.org/abs/1701.02434</a>.
+<div id="ref-betancourtDiagnosingBiasedInference2017" class="csl-entry" role="listitem">
+Betancourt, Michael. 2017. <span>“Diagnosing <span>Biased Inference</span> with <span>Divergences</span>.”</span> <em>Betanalpha.github.io</em>. <a href="https://github.com/betanalpha/knitr_case_studies/tree/master/divergences_and_bias">https://github.com/betanalpha/knitr_case_studies/tree/master/divergences_and_bias</a>.
 </div>
-<div id="ref-HierarchicalModeling" class="csl-entry" role="listitem">
-———. 2024. <span>“Hierarchical <span>Modeling</span>.”</span> <a href="https://betanalpha.github.io/assets/case_studies/hierarchical_modeling.html">https://betanalpha.github.io/assets/case_studies/hierarchical_modeling.html</a>.
-</div>
-<div id="ref-boxBayesianInferenceStatistical1992" class="csl-entry" role="listitem">
-Box, George E. P., and George C. Tiao. 1992. <span>“Bayesian Inference in Statistical Analysis.”</span> A <span>Wiley-Interscience</span> Publication. <span>New York</span>: <span>Wiley</span>. <a href="https://onlinelibrary-wiley-com.proxy.findit.cvt.dk/doi/epdf/10.1002/9781118033197">https://onlinelibrary-wiley-com.proxy.findit.cvt.dk/doi/epdf/10.1002/9781118033197</a>.
-</div>
-<div id="ref-gelmanBayesianWorkflow2020" class="csl-entry" role="listitem">
-Gelman, Andrew, Aki Vehtari, Daniel Simpson, Charles C. Margossian, Bob Carpenter, Yuling Yao, Lauren Kennedy, Jonah Gabry, Paul-Christian Bürkner, and Martin Modrák. 2020. <span>“Bayesian <span>Workflow</span>.”</span> <em>arXiv:2011.01808 [Stat]</em>, November. <a href="http://arxiv.org/abs/2011.01808">http://arxiv.org/abs/2011.01808</a>.
-</div>
-<div id="ref-jaynesProbabilityTheoryLogic2003" class="csl-entry" role="listitem">
-Jaynes, E. T. 2003. <span>“Probability Theory: The Logic of Science.”</span> Edited by G. Larry Bretthorst. <span>Cambridge, UK</span>: <a href="https://readyforai.com/download/probability-theory-the-logic-of-science-pdf/" class="uri">https://readyforai.com/download/probability-theory-the-logic-of-science-pdf/</a>; <span>Cambridge University Press</span>.
-</div>
-<div id="ref-laplaceMemoirProbabilityCauses1986" class="csl-entry" role="listitem">
-Laplace, Pierre Simon. 1986. <span>“Memoir on the <span>Probability</span> of the <span>Causes</span> of <span>Events</span>.”</span> <em>Statistical Science</em> 1 (3). <a href="https://doi.org/10.1214/ss/1177013621">https://doi.org/10.1214/ss/1177013621</a>.
-</div>
-<div id="ref-timonenImportanceSamplingApproach2022" class="csl-entry" role="listitem">
-Timonen, Juho, Nikolas Siccha, Ben Bales, Harri Lähdesmäki, and Aki Vehtari. 2022. <span>“An Importance Sampling Approach for Reliable and Efficient Inference in <span>Bayesian</span> Ordinary Differential Equation Models.”</span> <span>arXiv</span>. <a href="https://doi.org/10.48550/arXiv.2205.09059">https://doi.org/10.48550/arXiv.2205.09059</a>.
+<div id="ref-landesObjectiveBayesianismMaximum2013" class="csl-entry" role="listitem">
+Landes, Jürgen, and Jon Williamson. 2013. <span>“Objective <span>Bayesianism</span> and the <span>Maximum Entropy Principle</span>.”</span> <em>Entropy</em> 15 (12): 3528–91. <a href="https://doi.org/10.3390/e15093528">https://doi.org/10.3390/e15093528</a>.
 </div>
 <div id="ref-vehtariPracticalBayesianModel2017" class="csl-entry" role="listitem">
 Vehtari, Aki, Andrew Gelman, and Jonah Gabry. 2017. <span>“Practical <span>Bayesian</span> Model Evaluation Using Leave-One-Out Cross-Validation and <span>WAIC</span>.”</span> <em>Statistics and Computing</em> 27 (5): 1413–32. <a href="https://doi.org/10.1007/s11222-016-9696-4">https://doi.org/10.1007/s11222-016-9696-4</a>.
 </div>
 <div id="ref-vehtariRankNormalizationFoldingLocalization2021" class="csl-entry" role="listitem">
 Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and Paul-Christian Bürkner. 2021. <span>“Rank-<span>Normalization</span>, <span>Folding</span>, and <span>Localization</span>: <span>An Improved R^</span> for <span>Assessing Convergence</span> of <span>MCMC</span> (with <span>Discussion</span>).”</span> <em>Bayesian Analysis</em> 16 (2): 667–718. <a href="https://doi.org/10.1214/20-BA1221">https://doi.org/10.1214/20-BA1221</a>.
+</div>
+<div id="ref-vehtariSurveyBayesianPredictive2012" class="csl-entry" role="listitem">
+Vehtari, Aki, and Janne Ojanen. 2012. <span>“A Survey of <span>Bayesian</span> Predictive Methods for Model Assessment, Selection and Comparison.”</span> <em>Statistics Surveys</em> 6 (none): 142–228. <a href="https://doi.org/10.1214/12-SS102">https://doi.org/10.1214/12-SS102</a>.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

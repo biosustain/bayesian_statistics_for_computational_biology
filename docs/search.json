@@ -229,5 +229,71 @@
       "Course materials",
       "Introduction to Bayesian inference"
     ]
+  },
+  {
+    "objectID": "week3.html",
+    "href": "week3.html",
+    "title": "What to do after MCMC",
+    "section": "",
+    "text": "Plan for today:\n\nAfter MCMC: diagnostics, model evaluation, results\nCode your own Metropolis-Hastings sampler\n\nRecap from last week:\nMCMC: Monte Carlo Integration using Markov Chains\nStan: A probabilistic programming framework",
+    "crumbs": [
+      "Course materials",
+      "What to do after MCMC"
+    ]
+  },
+  {
+    "objectID": "week3.html#convergence",
+    "href": "week3.html#convergence",
+    "title": "Sampling is done: what now??",
+    "section": "Convergence",
+    "text": "Convergence\nTwo questions:\n\nDo my chains agree with each other?\nAre my chains stationary?\n\nThere is a number called \\(\\hat{R}\\) that tells you these things.\n\\(\\hat{R}\\) should be close to 1.\nFind out more: Vehtari et al. (2021)",
+    "crumbs": [
+      "Course materials",
+      "Sampling is done: what now??"
+    ]
+  },
+  {
+    "objectID": "week3.html#hatr",
+    "href": "week3.html#hatr",
+    "title": "What to do after MCMC",
+    "section": "\\(\\hat{R}\\)",
+    "text": "\\(\\hat{R}\\)\n\\(\\hat{R}\\) is a number that tells you:\n\nDo my chains agree with each other?\nAre my chains stationary?\n\n\\(\\hat{R}\\) should be close to 1. If not, you need to change something!\nFind out more: Vehtari et al. (2021)",
+    "crumbs": [
+      "Course materials",
+      "What to do after MCMC"
+    ]
+  },
+  {
+    "objectID": "week3.html#divergent-transitions",
+    "href": "week3.html#divergent-transitions",
+    "title": "What to do after MCMC",
+    "section": "Divergent transitions",
+    "text": "Divergent transitions\nThis diagnostic is specific to HMC.\nIt answers the question did the trajectory ODE solver fail?\nUsually the reason for the failure is a target distribution with very varying optimal step sizes.\nSometimes the location of the divergent transitions gives clues about the reason for the failure.\nFind out more: Betancourt (2017).",
+    "crumbs": [
+      "Course materials",
+      "What to do after MCMC"
+    ]
+  },
+  {
+    "objectID": "week3.html#very-quick-decision-theory",
+    "href": "week3.html#very-quick-decision-theory",
+    "title": "What to do after MCMC",
+    "section": "Very quick decision theory",
+    "text": "Very quick decision theory\nLoss function: If the observation is \\(y\\) and the model says \\(p(y) = z\\), how bad is that?\nTo choose a model, choose a loss function, then try to minimise estimated expected loss.\n\n\n\n\n\n\nImportant\n\n\n\nWhich loss function is best depends on the problem!\n\n\nTo estimate expected loss, make some predictions.\n\n\n\n\n\n\nImportant\n\n\n\nIn order to be useful for estimating model performance, predictions must be relevant to the evaluation context that matters.\ni.e. not from the training data, not from an already-observed sample, not from the past, etc…\n\n\nFind out more: Vehtari and Ojanen (2012)",
+    "crumbs": [
+      "Course materials",
+      "What to do after MCMC"
+    ]
+  },
+  {
+    "objectID": "week3.html#log-likelihood",
+    "href": "week3.html#log-likelihood",
+    "title": "What to do after MCMC",
+    "section": "Log likelihood",
+    "text": "Log likelihood\nA good default loss function:\n\\[\nloss(y, p(y)) = -\\ln{p(y)}\n\\]\nOut of sample log likelihood can often be approximated cheaply: see Vehtari, Gelman, and Gabry (2017).\nFind out more: (Landes and Williamson 2013, sec. 2.3)",
+    "crumbs": [
+      "Course materials",
+      "What to do after MCMC"
+    ]
   }
 ]

@@ -1,0 +1,107 @@
+# What to do after MCMC
+
+Plan for today:
+
+- After MCMC: [diagnostics](#mcmc-diagnostics), [model evaluation](#model-evaluation), [results](#Results)
+- Code your own Metropolis-Hastings sampler
+
+Recap from last week:
+
+**[MCMC](week2.md#MCMC)**: Monte Carlo Integration using Markov Chains
+
+**[Stan](week2.md#Stan)**: A probabilistic programming framework
+
+# MCMC diagnostics
+
+Overall aim: do my samples really come from my target probability distribution?
+
+General rules of thumb:
+
+- Run plenty of chains
+- Adopt a pessimistic mindset: one bad diagnostic is enough! 
+
+## $\hat{R}$
+
+$\hat{R}$ is a number that tells you:
+
+- Do my chains agree with each other?
+- Are my chains stationary?
+
+$\hat{R}$ should be close to 1. If not, you need to change something!
+
+Find out more: @vehtariRankNormalizationFoldingLocalization2021
+
+## Divergent transitions
+
+This diagnostic is specific to HMC.
+
+It answers the question *did the trajectory ODE solver fail?*
+
+Usually the reason for the failure is a target distribution with very varying
+optimal step sizes.
+
+Sometimes the location of the divergent transitions gives clues about the reason
+for the failure.
+
+Find out more:
+[@betancourtDiagnosingBiasedInference2017](https://betanalpha.github.io/assets/case_studies/divergences_and_bias.html).
+
+# Model evaluation
+
+## Very quick decision theory
+
+**Loss function**: If the observation is $y$ and the model says $p(y) = z$, how
+bad is that?
+
+To choose a model, choose a loss function, then try to minimise estimated
+expected loss.
+
+:::{.callout-important}
+
+Which loss function is best depends on the problem!
+
+:::
+
+To estimate expected loss, make some predictions.
+
+:::{.callout-important}
+
+In order to be useful for estimating model performance, predictions must be
+relevant to the evaluation context that matters.
+
+i.e. not from the training data, not from an already-observed sample, not from
+the past, etc...
+
+:::
+
+Find out more: @vehtariSurveyBayesianPredictive2012
+
+## Log likelihood
+
+A good default loss function:
+
+$$
+loss(y, p(y)) = -\ln{p(y)}
+$$
+
+Out of sample log likelihood can often be approximated cheaply: see
+@vehtariPracticalBayesianModel2017.
+
+Find out more: [@landesObjectiveBayesianismMaximum2013, section 2.3] 
+
+
+# Results
+
+Some useful summary statistics:
+
+Statistic | Answers the question
+-------- | --------------------
+Mean | "What does the model think is the most likely value"
+Standard deviation | "How sure is my model about this?"
+Quantile n | "What is x s.t. my model is n% sure that the quantity is at least x?"
+
+Do I have enough samples? To find out, calculate the [Monte Carlo Standard Error](https://mc-stan.org/docs/reference-manual/effective-sample-size.html#estimation-of-mcmc-standard-error).
+
+:::{.callout-important}
+MCSE can vary for different statistics relating to the same quantity
+:::
