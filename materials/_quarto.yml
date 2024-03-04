@@ -11,7 +11,7 @@ project:
     - index.md
     - week1.md
     - week2.md
-    - week3.md
+    - week3.qmd
 
 website:
   title: "Bayesian Statistics for Computational Biology"
@@ -30,7 +30,7 @@ website:
         contents:
         - week1.md
         - week2.md
-        - week3.md
+        - week3.qmd
 
 format:
   html:

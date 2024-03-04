@@ -105,3 +105,58 @@ Do I have enough samples? To find out, calculate the [Monte Carlo Standard Error
 :::{.callout-important}
 MCSE can vary for different statistics relating to the same quantity
 :::
+
+# Example
+
+We'll go through some diagnostics using [arviz](https://python.arviz.org).
+
+```{python}
+import arviz as az
+import numpy as np
+import xarray as xr
+
+idata = az.load_arviz_data("radon")
+idata
+```
+
+The function `az.summary` lets us look at some useful summary statistics,
+including $\hat{R}$ and divergent transitions.
+
+The variable `lp`, which you can find in the group `sample_stats` is the
+model's total log probability density. It's not very meaningful on its own,
+but is useful for judging overall convergence. `diverging` counts the number of
+divergent transitions.
+
+```{python}
+az.summary(idata.sample_stats, var_names=["lp", "diverging"])
+```
+
+Sometimes it's useful to check the convergence of individual parameters. This
+can be done by pointing `az.summary` at the group where the parameters of
+interest live. In this case the group is called `posterior`.
+
+```{python}
+az.summary(idata.posterior, var_names=["sigma", "g"])
+```
+
+The function `az.loo` performs approximate leave-one-out cross validation, which can be useful for evaluating how well the model might make predictions.
+
+```{python}
+az.loo(idata, var_name="y", pointwise=True)
+
+```
+
+```{python}
+idata.log_likelihood["fake"] = xr.DataArray(
+    np.random.normal(0, 2, [4, 500, 919]),
+    coords=idata.log_likelihood.coords,
+    dims=idata.log_likelihood.dims
+)
+az.compare(
+    {
+        "real": az.loo(idata, var_name="y"), 
+        "fake": az.loo(idata, var_name="fake")
+    }
+)
+
+```
