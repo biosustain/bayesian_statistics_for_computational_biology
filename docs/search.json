@@ -1,57 +1,178 @@
 [
   {
-    "objectID": "week3.html",
-    "href": "week3.html",
-    "title": "What to do after MCMC",
+    "objectID": "metropolis-hastings.html",
+    "href": "metropolis-hastings.html",
+    "title": "Metropolis Hastings",
     "section": "",
-    "text": "Plan for today:\nRecap from last week:\nMCMC: Monte Carlo Integration using Markov Chains\nStan: A probabilistic programming framework",
+    "text": "Welcome back!\nPlan for today:\n\nProblem Statement\nMarkov Chains\nMetropolis-Hastings explained\nWhat are the limitations?\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "week3.html#hatr",
-    "href": "week3.html#hatr",
-    "title": "What to do after MCMC",
-    "section": "\\(\\hat{R}\\)",
-    "text": "\\(\\hat{R}\\)\n\\(\\hat{R}\\) is a number that tells you:\n\nDo my chains agree with each other?\nAre my chains stationary?\n\n\\(\\hat{R}\\) should be close to 1. If not, you need to change something!\nFind out more: Vehtari et al. (2021)",
+    "objectID": "metropolis-hastings.html#introduction",
+    "href": "metropolis-hastings.html#introduction",
+    "title": "Metropolis Hastings",
+    "section": "",
+    "text": "Welcome back!\nPlan for today:\n\nProblem Statement\nMarkov Chains\nMetropolis-Hastings explained\nWhat are the limitations?\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "week3.html#divergent-transitions",
-    "href": "week3.html#divergent-transitions",
-    "title": "What to do after MCMC",
-    "section": "Divergent transitions",
-    "text": "Divergent transitions\nThis diagnostic is specific to HMC.\nIt answers the question did the trajectory ODE solver fail?\nUsually the reason for the failure is a target distribution with very varying optimal step sizes.\nSometimes the location of the divergent transitions gives clues about the reason for the failure.\nFind out more: Betancourt (2017).",
+    "objectID": "metropolis-hastings.html#mcmc",
+    "href": "metropolis-hastings.html#mcmc",
+    "title": "Metropolis Hastings",
+    "section": "MCMC",
+    "text": "MCMC",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "week3.html#very-quick-decision-theory",
-    "href": "week3.html#very-quick-decision-theory",
-    "title": "What to do after MCMC",
-    "section": "Very quick decision theory",
-    "text": "Very quick decision theory\nLoss function: If the observation is \\(y\\) and the model says \\(p(y) = z\\), how bad is that?\nTo choose a model, choose a loss function, then try to minimise estimated expected loss.\n\n\n\n\n\n\nImportant\n\n\n\nWhich loss function is best depends on the problem!\n\n\nTo estimate expected loss, make some predictions.\n\n\n\n\n\n\nImportant\n\n\n\nIn order to be useful for estimating model performance, predictions must be relevant to the evaluation context that matters.\ni.e. not from the training data, not from an already-observed sample, not from the past, etc…\n\n\nFind out more: Vehtari and Ojanen (2012)",
+    "objectID": "metropolis-hastings.html#markov-chains",
+    "href": "metropolis-hastings.html#markov-chains",
+    "title": "Metropolis Hastings",
+    "section": "Markov Chains",
+    "text": "Markov Chains\nA Markov Chain is any process that is memoryless such that\n\\[ p(x^{i} | x^{i-1},...,x^{1}) = p(x^{i} | x^{i-1}). \\]\nFor example:\n\nThe transitions can be measured as discrete time steps with the following matrix representation\n\nimport numpy as np\nT = np.matrix([[0.1, 0.1, 0.8], [0.5, 0.1, 0.4], [0.5, 0.2, 0.3]])\nprint(T)\n\n[[0.1 0.1 0.8]\n [0.5 0.1 0.4]\n [0.5 0.2 0.3]]\n\n\nGiven an initial starting position\n\nv0 = np.matrix([0.1, 0.4, 0.5])\nprint(v0)\n\n[[0.1 0.4 0.5]]\n\n\nWe can simulate the probabilities of the next step given the transition matrix.\n\nv1 = v0*T\nprint(v1)\n\n[[0.46 0.15 0.39]]\n\n\nFollowing this again we can simulate the states after two steps\n\nv2 = v1*T\nprint(v2)\n\n[[0.316 0.139 0.545]]\n\n\nThere’s a convenient way to calculate the next step given the starting condition.\n\nprint(v0*T**2)\n\n[[0.316 0.139 0.545]]\n\n\nWhat happens if we continue doing this for a long time?\n\nprint(v0*T**100)\n\n[[0.35714286 0.14935065 0.49350649]]\n\n\nAnd how does this change when taking the next step?\n\nprint(v0*T**101)\n\n[[0.35714286 0.14935065 0.49350649]]\n\n\nThis Markov Chain has the property of being a stationary distribution. That satisfies the following\n\\[ \\pi = \\pi T. \\]\nOur objective is to estimate \\(\\pi\\), which represents the target distribution.\nThis behaviour of the Markov Chain is only satisfied if two conditions are met.\n\nThe Markov Chain is irreducible\n\nAny point in the Markov chain can be reached by any other point\n\nThe Markov Chain is aperiodic Any point can be reached by any other point in a single step",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "week3.html#log-likelihood",
-    "href": "week3.html#log-likelihood",
-    "title": "What to do after MCMC",
-    "section": "Log likelihood",
-    "text": "Log likelihood\nA good default loss function:\n\\[\nloss(y, p(y)) = -\\ln{p(y)}\n\\]\nOut of sample log likelihood can often be approximated cheaply: see Vehtari, Gelman, and Gabry (2017).\nFind out more: (Landes and Williamson 2013, sec. 2.3)",
+    "objectID": "metropolis-hastings.html#markov-chain-monte-carlo",
+    "href": "metropolis-hastings.html#markov-chain-monte-carlo",
+    "title": "Metropolis Hastings",
+    "section": "Markov Chain Monte Carlo",
+    "text": "Markov Chain Monte Carlo\nIf we are able to draw samples from a Markov Chain that satisfies these properties we can generate samples from the stationary proposal distribution. After drawing samples from the sample distribution we can investigate the quantities of interest using Monte Carlo integration (read: counting samples).\nOne property that is not required for a Markov Chain but satisfies the above two properties is the detailed balance. This is not a requirement, but it’s pretty easy to define a detailed balance rather than to define general balance. This ensures that the Markov chain is reversible, in other words\n\\[ \\pi(x)*T(x'|x) = \\pi(x')*T(x|x')\\].\nIf we define a reducible process it is defined to be irreducible and aperiodic by default. It is a periodic because you can always go back, and irreducible because a region cannot be entered if there is no way of returning.\nThe process of generating a Markov Chain with these properties means that we know we are sampling from a stationary target distribution, if we have enough samples.",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
+    ]
+  },
+  {
+    "objectID": "metropolis-hastings.html#going-from-discrete-to-continuous",
+    "href": "metropolis-hastings.html#going-from-discrete-to-continuous",
+    "title": "Metropolis Hastings",
+    "section": "Going from discrete to continuous",
+    "text": "Going from discrete to continuous\nRather than the previous graph networks described before we can expand this to the continuous number line.\nNote: This isn’t always a possibility to transition between discrete and continuous number lines, it just works out for this case\nRather than sampling from \\(\\pi(x)\\), representing the discrete case, we will change the notation to \\(p(x)\\). And the transition kernel, rather than a matrix \\(T(x'|x)\\) will be represented by \\(K(x'|x).\\)\n\nMetropolis-Hastings\nMetropolis-Hastings enforces the reversibility constraint using the accept-reject function\n\\[\nA(x,x') = min(1, \\frac{p(x')g(x|x')}{p(x)g(x'|x)})\n\\]\nand often, a symmetric proposal distribution, e.g.\n\\[\ng(x'|x) = N(x, \\sigma).\n\\]\nThe resulting kernel is represented as\n\\[\nK(x'|x) = g(x'|x)*A(x,x').\n\\]\nThe accept-reject function, and the symmetric proposal distribution were chosen to satisfy the detailed balance function\n\\[\np(x)g(x'|x)A(x,x') = p(x')g(x|x')A(x,x').\n\\]\nTherefore, if we draw samples using the Metropolis-Hastings algorithm, we draw samples from the target distribution \\(p(x)\\).",
+    "crumbs": [
+      "Course materials",
+      "Metropolis Hastings"
+    ]
+  },
+  {
+    "objectID": "metropolis-hastings.html#coding-the-metropolis-hastings-in-practice",
+    "href": "metropolis-hastings.html#coding-the-metropolis-hastings-in-practice",
+    "title": "Metropolis Hastings",
+    "section": "Coding the Metropolis Hastings in practice",
+    "text": "Coding the Metropolis Hastings in practice\n\nPart 1: sampling from a normal distribution\nGiven a \\(p(x) = N(2, 0.5)\\) how would draw samples using the Metropolis-Hastings algorithm?\n\nChoose proposal value\nEvaluate probability ratio\nAccept-Reject\nincrement step\n\n\nDefine probability density function\n\nimport numpy as np\nfrom scipy.stats import norm\n\ndef prob(x):\n  return norm.pdf(x, 2, 0.5)\n\n\n\nDefine proposal distribution\n\ndef proposal(x):\n  return norm.rvs(x, 1, 1)[0]\n\n\n\nInitialise sampler\n\ncurrent = 0.0\nsamples = [current]\n\n\n\nSample from distribution\n\nfor i in range(10000):\n    prop = proposal(current)\n    accept_reject = prob(prop)/prob(current)\n    if accept_reject &gt; 1:\n        samples.append(prop)\n        current = prop\n    else:\n        cutoff = np.random.rand(1)[0]\n        if accept_reject &gt; cutoff:\n            samples.append(prop)\n            current = prop\n\n\n\nPlot distribution\n\nimport matplotlib.pyplot as plt\nplt.hist(samples)\n\n(array([   9.,   19.,  165.,  553., 1188., 1376., 1101.,  513.,  105.,\n          21.]),\n array([-0.05314943,  0.32707221,  0.70729385,  1.08751549,  1.46773713,\n         1.84795877,  2.22818041,  2.60840205,  2.98862369,  3.36884533,\n         3.74906698]),\n &lt;BarContainer object of 10 artists&gt;)\n\n\n\n\n\n\n\n\n\n\n\nTrace plot\n\ndraw = [draw for draw, _ in enumerate(samples)]\nplt.plot(draw, samples)\n\n\n\n\n\n\n\n\n\n\n\nPart 2: determining mean and standard deviation from data",
+    "crumbs": [
+      "Course materials",
+      "Metropolis Hastings"
+    ]
+  },
+  {
+    "objectID": "metropolis-hastings.html#hyperspheres-in-hyperspace-dont-make-much-sense",
+    "href": "metropolis-hastings.html#hyperspheres-in-hyperspace-dont-make-much-sense",
+    "title": "Metropolis Hastings",
+    "section": "Hyperspheres in hyperspace don’t make much sense",
+    "text": "Hyperspheres in hyperspace don’t make much sense\nWhy volume in higher dimensions is non-intuitive.",
+    "crumbs": [
+      "Course materials",
+      "Metropolis Hastings"
+    ]
+  },
+  {
+    "objectID": "week2.html",
+    "href": "week2.html",
+    "title": "MCMC and Stan",
+    "section": "",
+    "text": "Welcome back!\nPlan for today:\n\nMCMC\nGetting started with Stan in Python\n\nRecap from last week:\nBayesian inference: Statistical inference resulting in probabilities\nWhy in general? Probability is expressive, old and decomposes nicely\nWhy in biology? Hierarchical regression models with ODEs\nThe big challenge Integrating high dimensional probability functions\n\n\n\n\n\nIn A rule for evaluating the target function and maybe its gradients\nOut: A Markov Chain of numbers that you can do Monte Carlo integration with.\n\n\n\n\n\n\nOne random variable \\(X\\) with probability density function \\(density\\).\nAka a “one-dimensional parameter space”.\nEvaluating \\(density(x)\\) for a given value \\(x\\) (aka “point in parameter space”) is easy.\nCalculating the area under a region of the \\(density\\) curve (aka “the probability mass”) is expensive.\nThis is annoying, we need to know that!\n\n\n\nGenerate a series \\(x_1, ..., x_i,..., x_n\\) where every number depends on the previous number(s), i.e. a Markov chain.\nTo calculate \\(x_{i+1}\\), generate a random number and take into account \\(density(x_i)\\). 1\n1 This is the interesting and tricky bit!\nIf this works, with a long enough series of numbers we get something like this:\n\n\n\n\n\n\n\nSuccess condition for MCMC\n\n\n\nThe numbers from the Markov chain have to approximately agree with the target density function, i.e. in any region the number of dots is approximately proportional to the area under the curve.\n\n\nNow we can do Monte Carlo integration, i.e. approximate the area under a region of curve by counting the red dots in that region.\n\n\n\n\nThe first (I think?) MCMC algorithm. Original paper: Metropolis et al. (1953).2\n2 Metropolis was first author but didn’t do any work! That was Arianna Rosenbluth (programming) plus Marshall Rosenbluth & Edward Teller (maths)Generates Markov chains that provably agree with arbitrary target density functions (in the asymptotic limit).\nRoughly how it works:\n\nChoose candidate by randomly perturbing previous point \\(x_i\\)\nAccept or reject candidate randomly according to the ratio \\(\\frac{density(candidate)}{density(x_i)}\\)\n\\(x_{i+1}\\) is candidate if accept else x_i\n\nVisualisation\nDoesn’t work for more than ~10 dimensional parameter spaces.\n\n\n\nBig picture: MCMC that works for large parameter spaces.\nKey innovation: travel through parameter space quickly using gradients.\nIllustration:\n\nA better illustration\n\n\n\n\n\n\nA small but important detail:\n\n\n\nTo decide how hard to flick the ball and how precisely to calculate its trajectory for a particular case, adaptation is required, i.e. running the algorithm in warm-up mode for a bit and learning by trial and error. How best to do adaptation is an important open question.\n\n\nLimitations:\n\nNo discrete parameters\nPerforms badly when the target (log-scale) density function is wiggly.\n\n\n\nBetancourt (2018b)\nBetancourt (2018a)\nBeskos et al. (2010)\nAndrieu and Andrieu (2003)\n\n\n\n\n\nStan is:\n\nA language for specifying probability density functions as Stan programs.\nA compiler that turns Stan programs into instructions for inference engines.\nAn inference engine implementing adaptive HMC and some other algorithms.\nA library of functions for calculating the gradients of interesting probability density functions.\nSome interfaces for popular computer tools:\n\nCommand line: cmdstan\nPython:\n\ncmdstanpy\npystan\n\nR:\n\ncmdstanr\nRstan\n\n\n\n\n\nAlternatives: pymc, blackjax, Turing.jl tensorflow probability\nOverview as of 2023: Štrumbelj et al. (2023).\nWhy I like Stan:\n\nBig, active and knowledgeable community (most important reason)\nFeatureful (complex numbers, fast solvers, up-to-date diagnostics)\nFast (for CPU-bound, general purpose adaptive HMC)\n\n\n\n\n\nInstall cmdstanpy\npip install cmdstanpy\nUse cmdstanpy to install the rest of Stan\npython -m cmdstanpy.install_cmdstan --cores 2\nI like to store Stan outputs using the library arviz. It also makes nice plots.\npip install arviz\n\n\nA Stan program consists of function definitions, variable declarations and statements, organised into {...} delimited blocks, e.g.\ndata {\n  real y;  # a variable declaration\n}\nmodel {\n  y ~ normal(0, 1.4);  # a statement\n}\nThe purpose of a Stan program is to define the probability density for any combination of data and parameters.\nIt is ok for there to be no parameters:\ntransformed data {\n  real y = 2;  # this is both a statement and a declaration!\n}\nmodel {\n  y ~ normal(0, 1.4);  # the total density is N(2 | 0, 1.4) = 0.103\n}\nor no data:\nparameters {\n  real alpha;\n}\nmodel {\n  alpha ~ normal(0, 1.4);  # Stan can find the density for any alpha\n}\n\n\n\n\n\nUse standard Python tools to make a dictionary mapping data variables to inputs e.g.\nmy_stan_input = {\"y\": 2}\n(Optional) Save the input as a json file:\nimport json\nwith open(\"my_stan_input.json\", \"w\") as f:\n    json.dump(my_stan_input, f)\n\n\n\nInstantiate a CmdstanModel\nfrom cmdstanpy import CmdStanModel\nmy_model = CmdStanModel(stan_file=\"my_stan_program.stan\")\nCmdstanpy will use Stan’s compiler to create .hpp and executable files.\n\n\n\nUse the method CmdStanModel.sample to trigger adaptive HMC.\nmy_mcmc_results = my_model.sample(data=my_stan_input)\n\n\n\nUse the methods CmdStanMCMC.diagnose and CmdStanMCMC.summary for quick diagnostics.\nsummary = my_mcmc_results.summary()\ndiagnostics = my_mcmc_results.diagnose()\n\n\n\nConvert to arviz InferenceData and save\nimport arviz\nmy_idata = arviz.from_cmdstanpy(my_mcmc_results)\nmy_idata.to_json(\"my_arviz_idata.json\")\n\n\n\n\nCmdstanpy docs\nStan reference manual\nStan functions reference\nStan User’s guide\nstan-dev github organisation",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "week2.html#introduction",
+    "href": "week2.html#introduction",
+    "title": "MCMC and Stan",
+    "section": "",
+    "text": "Welcome back!\nPlan for today:\n\nMCMC\nGetting started with Stan in Python\n\nRecap from last week:\nBayesian inference: Statistical inference resulting in probabilities\nWhy in general? Probability is expressive, old and decomposes nicely\nWhy in biology? Hierarchical regression models with ODEs\nThe big challenge Integrating high dimensional probability functions",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "week2.html#mcmc",
+    "href": "week2.html#mcmc",
+    "title": "MCMC and Stan",
+    "section": "",
+    "text": "In A rule for evaluating the target function and maybe its gradients\nOut: A Markov Chain of numbers that you can do Monte Carlo integration with.\n\n\n\n\n\n\nOne random variable \\(X\\) with probability density function \\(density\\).\nAka a “one-dimensional parameter space”.\nEvaluating \\(density(x)\\) for a given value \\(x\\) (aka “point in parameter space”) is easy.\nCalculating the area under a region of the \\(density\\) curve (aka “the probability mass”) is expensive.\nThis is annoying, we need to know that!\n\n\n\nGenerate a series \\(x_1, ..., x_i,..., x_n\\) where every number depends on the previous number(s), i.e. a Markov chain.\nTo calculate \\(x_{i+1}\\), generate a random number and take into account \\(density(x_i)\\). 1\n1 This is the interesting and tricky bit!\nIf this works, with a long enough series of numbers we get something like this:\n\n\n\n\n\n\n\nSuccess condition for MCMC\n\n\n\nThe numbers from the Markov chain have to approximately agree with the target density function, i.e. in any region the number of dots is approximately proportional to the area under the curve.\n\n\nNow we can do Monte Carlo integration, i.e. approximate the area under a region of curve by counting the red dots in that region.\n\n\n\n\nThe first (I think?) MCMC algorithm. Original paper: Metropolis et al. (1953).2\n2 Metropolis was first author but didn’t do any work! That was Arianna Rosenbluth (programming) plus Marshall Rosenbluth & Edward Teller (maths)Generates Markov chains that provably agree with arbitrary target density functions (in the asymptotic limit).\nRoughly how it works:\n\nChoose candidate by randomly perturbing previous point \\(x_i\\)\nAccept or reject candidate randomly according to the ratio \\(\\frac{density(candidate)}{density(x_i)}\\)\n\\(x_{i+1}\\) is candidate if accept else x_i\n\nVisualisation\nDoesn’t work for more than ~10 dimensional parameter spaces.\n\n\n\nBig picture: MCMC that works for large parameter spaces.\nKey innovation: travel through parameter space quickly using gradients.\nIllustration:\n\nA better illustration\n\n\n\n\n\n\nA small but important detail:\n\n\n\nTo decide how hard to flick the ball and how precisely to calculate its trajectory for a particular case, adaptation is required, i.e. running the algorithm in warm-up mode for a bit and learning by trial and error. How best to do adaptation is an important open question.\n\n\nLimitations:\n\nNo discrete parameters\nPerforms badly when the target (log-scale) density function is wiggly.\n\n\n\nBetancourt (2018b)\nBetancourt (2018a)\nBeskos et al. (2010)\nAndrieu and Andrieu (2003)",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "week2.html#stan",
+    "href": "week2.html#stan",
+    "title": "MCMC and Stan",
+    "section": "",
+    "text": "Stan is:\n\nA language for specifying probability density functions as Stan programs.\nA compiler that turns Stan programs into instructions for inference engines.\nAn inference engine implementing adaptive HMC and some other algorithms.\nA library of functions for calculating the gradients of interesting probability density functions.\nSome interfaces for popular computer tools:\n\nCommand line: cmdstan\nPython:\n\ncmdstanpy\npystan\n\nR:\n\ncmdstanr\nRstan\n\n\n\n\n\nAlternatives: pymc, blackjax, Turing.jl tensorflow probability\nOverview as of 2023: Štrumbelj et al. (2023).\nWhy I like Stan:\n\nBig, active and knowledgeable community (most important reason)\nFeatureful (complex numbers, fast solvers, up-to-date diagnostics)\nFast (for CPU-bound, general purpose adaptive HMC)",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "week2.html#getting-started-with-stan-in-python",
+    "href": "week2.html#getting-started-with-stan-in-python",
+    "title": "MCMC and Stan",
+    "section": "",
+    "text": "Install cmdstanpy\npip install cmdstanpy\nUse cmdstanpy to install the rest of Stan\npython -m cmdstanpy.install_cmdstan --cores 2\nI like to store Stan outputs using the library arviz. It also makes nice plots.\npip install arviz\n\n\nA Stan program consists of function definitions, variable declarations and statements, organised into {...} delimited blocks, e.g.\ndata {\n  real y;  # a variable declaration\n}\nmodel {\n  y ~ normal(0, 1.4);  # a statement\n}\nThe purpose of a Stan program is to define the probability density for any combination of data and parameters.\nIt is ok for there to be no parameters:\ntransformed data {\n  real y = 2;  # this is both a statement and a declaration!\n}\nmodel {\n  y ~ normal(0, 1.4);  # the total density is N(2 | 0, 1.4) = 0.103\n}\nor no data:\nparameters {\n  real alpha;\n}\nmodel {\n  alpha ~ normal(0, 1.4);  # Stan can find the density for any alpha\n}\n\n\n\n\n\nUse standard Python tools to make a dictionary mapping data variables to inputs e.g.\nmy_stan_input = {\"y\": 2}\n(Optional) Save the input as a json file:\nimport json\nwith open(\"my_stan_input.json\", \"w\") as f:\n    json.dump(my_stan_input, f)\n\n\n\nInstantiate a CmdstanModel\nfrom cmdstanpy import CmdStanModel\nmy_model = CmdStanModel(stan_file=\"my_stan_program.stan\")\nCmdstanpy will use Stan’s compiler to create .hpp and executable files.\n\n\n\nUse the method CmdStanModel.sample to trigger adaptive HMC.\nmy_mcmc_results = my_model.sample(data=my_stan_input)\n\n\n\nUse the methods CmdStanMCMC.diagnose and CmdStanMCMC.summary for quick diagnostics.\nsummary = my_mcmc_results.summary()\ndiagnostics = my_mcmc_results.diagnose()\n\n\n\nConvert to arviz InferenceData and save\nimport arviz\nmy_idata = arviz.from_cmdstanpy(my_mcmc_results)\nmy_idata.to_json(\"my_arviz_idata.json\")\n\n\n\n\nCmdstanpy docs\nStan reference manual\nStan functions reference\nStan User’s guide\nstan-dev github organisation",
+    "crumbs": [
+      "Course materials",
+      "MCMC and Stan"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome!",
+    "section": "",
+    "text": "This is a course about Bayesian statistics, targeted at systems biologists.\nThere are three intended learning outcomes:\n\nUnderstand the theoretical basis for applying Bayesian data analysis to practical scientific problems\nDevelop a familiarity with implementing Bayesian data analysis using modern software tools\nGain deep understanding of both theory and practice of elements of Bayesian data analysis that are particularly relevant to computational biology, including custom hierarchical models, large analyses and statistical models with embedded ODE systems.\n\n\n\nEach week we have a one-hour seminar. The goal is to spend the time approximately as follows:\n\n25-35mins on ‘theory’, aka learning things from the book and getting more reading material\n25-35mins on practical computer work\n\n\n\n\n\n\n\n\nStatistical inference in general\nBayesian statistical inference\nThe big challenge: dimensionality\n\n\n\nSet up development environment\ngit basics\nInstall Stan and cmdstanpy\n\n\n\nJaynes (2003, Ch. 1)\nLaplace (1986)\nBox and Tiao (1992, Ch. 1.1)\n\n\n\n\n\n\nWhat is MCMC?\nHamiltonian Monte Carlo\nProbabilistic programming\n\n\n\nRun an MCMC algorithm and inspect the results\n\n\n\nBetancourt (2018)\n\n\n\n\n\n\nDiagnostics: convergence, divergent transitions, effective sample size\nModel evaluation as decision theory\nWhy negative log likelihood is a good default loss function\n\n\n\nDiagnose some good and bad MCMC runs\n\n\n\nVehtari et al. (2021)\nVehtari, Gelman, and Gabry (2017)\n\n\n\n\n\n\nParts of a statistical anlaysis (not just inference!)\nWhy Bayesian workflow is complex: non-linearity and plurality\nWriting scalable statistical programming projects\n\n\n\nWrite a scalable statistical analysis with bibat.\n\n\n\nGelman et al. (2020)\n\n\n\n\n\n\nGeneralised linear models\nPrior elicitation\nHierarchical models\n\n\n\nCompare some statistical models of a simulated biological dataset\n\n\n\nBetancourt (2024)\n\n\n\n\n\n\nWhat is an ODE?\nODE solvers\nODE solvers inside probabilistic programs\n\n\n\nFit a model with an ODE.\n\n\n\nTimonen et al. (2022)\n\n\n\n\n\n\nClose reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.\n\n\n\nProject brainstorm\n\n\n\n\nFormat: one hour joint feedback and help session",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  },
+  {
+    "objectID": "index.html#general-format",
+    "href": "index.html#general-format",
+    "title": "Welcome!",
+    "section": "",
+    "text": "Each week we have a one-hour seminar. The goal is to spend the time approximately as follows:\n\n25-35mins on ‘theory’, aka learning things from the book and getting more reading material\n25-35mins on practical computer work",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
+    ]
+  },
+  {
+    "objectID": "index.html#plan",
+    "href": "index.html#plan",
+    "title": "Welcome!",
+    "section": "",
+    "text": "Statistical inference in general\nBayesian statistical inference\nThe big challenge: dimensionality\n\n\n\nSet up development environment\ngit basics\nInstall Stan and cmdstanpy\n\n\n\nJaynes (2003, Ch. 1)\nLaplace (1986)\nBox and Tiao (1992, Ch. 1.1)\n\n\n\n\n\n\nWhat is MCMC?\nHamiltonian Monte Carlo\nProbabilistic programming\n\n\n\nRun an MCMC algorithm and inspect the results\n\n\n\nBetancourt (2018)\n\n\n\n\n\n\nDiagnostics: convergence, divergent transitions, effective sample size\nModel evaluation as decision theory\nWhy negative log likelihood is a good default loss function\n\n\n\nDiagnose some good and bad MCMC runs\n\n\n\nVehtari et al. (2021)\nVehtari, Gelman, and Gabry (2017)\n\n\n\n\n\n\nParts of a statistical anlaysis (not just inference!)\nWhy Bayesian workflow is complex: non-linearity and plurality\nWriting scalable statistical programming projects\n\n\n\nWrite a scalable statistical analysis with bibat.\n\n\n\nGelman et al. (2020)\n\n\n\n\n\n\nGeneralised linear models\nPrior elicitation\nHierarchical models\n\n\n\nCompare some statistical models of a simulated biological dataset\n\n\n\nBetancourt (2024)\n\n\n\n\n\n\nWhat is an ODE?\nODE solvers\nODE solvers inside probabilistic programs\n\n\n\nFit a model with an ODE.\n\n\n\nTimonen et al. (2022)\n\n\n\n\n\n\nClose reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.\n\n\n\nProject brainstorm\n\n\n\n\nFormat: one hour joint feedback and help session",
+    "crumbs": [
+      "Admin",
+      "Welcome!"
     ]
   },
   {
@@ -198,91 +319,58 @@
     ]
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome!",
+    "objectID": "week3.html",
+    "href": "week3.html",
+    "title": "What to do after MCMC",
     "section": "",
-    "text": "This is a course about Bayesian statistics, targeted at systems biologists.\nThere are three intended learning outcomes:\n\nUnderstand the theoretical basis for applying Bayesian data analysis to practical scientific problems\nDevelop a familiarity with implementing Bayesian data analysis using modern software tools\nGain deep understanding of both theory and practice of elements of Bayesian data analysis that are particularly relevant to computational biology, including custom hierarchical models, large analyses and statistical models with embedded ODE systems.\n\n\n\nEach week we have a one-hour seminar. The goal is to spend the time approximately as follows:\n\n25-35mins on ‘theory’, aka learning things from the book and getting more reading material\n25-35mins on practical computer work\n\n\n\n\n\n\n\n\nStatistical inference in general\nBayesian statistical inference\nThe big challenge: dimensionality\n\n\n\nSet up development environment\ngit basics\nInstall Stan and cmdstanpy\n\n\n\nJaynes (2003, Ch. 1)\nLaplace (1986)\nBox and Tiao (1992, Ch. 1.1)\n\n\n\n\n\n\nWhat is MCMC?\nHamiltonian Monte Carlo\nProbabilistic programming\n\n\n\nRun an MCMC algorithm and inspect the results\n\n\n\nBetancourt (2018)\n\n\n\n\n\n\nDiagnostics: convergence, divergent transitions, effective sample size\nModel evaluation as decision theory\nWhy negative log likelihood is a good default loss function\n\n\n\nDiagnose some good and bad MCMC runs\n\n\n\nVehtari et al. (2021)\nVehtari, Gelman, and Gabry (2017)\n\n\n\n\n\n\nParts of a statistical anlaysis (not just inference!)\nWhy Bayesian workflow is complex: non-linearity and plurality\nWriting scalable statistical programming projects\n\n\n\nWrite a scalable statistical analysis with bibat.\n\n\n\nGelman et al. (2020)\n\n\n\n\n\n\nGeneralised linear models\nPrior elicitation\nHierarchical models\n\n\n\nCompare some statistical models of a simulated biological dataset\n\n\n\nBetancourt (2024)\n\n\n\n\n\n\nWhat is an ODE?\nODE solvers\nODE solvers inside probabilistic programs\n\n\n\nFit a model with an ODE.\n\n\n\nTimonen et al. (2022)\n\n\n\n\n\n\nClose reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.\n\n\n\nProject brainstorm\n\n\n\n\nFormat: one hour joint feedback and help session",
-    "crumbs": [
-      "Admin",
-      "Welcome!"
-    ]
-  },
-  {
-    "objectID": "index.html#general-format",
-    "href": "index.html#general-format",
-    "title": "Welcome!",
-    "section": "",
-    "text": "Each week we have a one-hour seminar. The goal is to spend the time approximately as follows:\n\n25-35mins on ‘theory’, aka learning things from the book and getting more reading material\n25-35mins on practical computer work",
-    "crumbs": [
-      "Admin",
-      "Welcome!"
-    ]
-  },
-  {
-    "objectID": "index.html#plan",
-    "href": "index.html#plan",
-    "title": "Welcome!",
-    "section": "",
-    "text": "Statistical inference in general\nBayesian statistical inference\nThe big challenge: dimensionality\n\n\n\nSet up development environment\ngit basics\nInstall Stan and cmdstanpy\n\n\n\nJaynes (2003, Ch. 1)\nLaplace (1986)\nBox and Tiao (1992, Ch. 1.1)\n\n\n\n\n\n\nWhat is MCMC?\nHamiltonian Monte Carlo\nProbabilistic programming\n\n\n\nRun an MCMC algorithm and inspect the results\n\n\n\nBetancourt (2018)\n\n\n\n\n\n\nDiagnostics: convergence, divergent transitions, effective sample size\nModel evaluation as decision theory\nWhy negative log likelihood is a good default loss function\n\n\n\nDiagnose some good and bad MCMC runs\n\n\n\nVehtari et al. (2021)\nVehtari, Gelman, and Gabry (2017)\n\n\n\n\n\n\nParts of a statistical anlaysis (not just inference!)\nWhy Bayesian workflow is complex: non-linearity and plurality\nWriting scalable statistical programming projects\n\n\n\nWrite a scalable statistical analysis with bibat.\n\n\n\nGelman et al. (2020)\n\n\n\n\n\n\nGeneralised linear models\nPrior elicitation\nHierarchical models\n\n\n\nCompare some statistical models of a simulated biological dataset\n\n\n\nBetancourt (2024)\n\n\n\n\n\n\nWhat is an ODE?\nODE solvers\nODE solvers inside probabilistic programs\n\n\n\nFit a model with an ODE.\n\n\n\nTimonen et al. (2022)\n\n\n\n\n\n\nClose reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.\n\n\n\nProject brainstorm\n\n\n\n\nFormat: one hour joint feedback and help session",
-    "crumbs": [
-      "Admin",
-      "Welcome!"
-    ]
-  },
-  {
-    "objectID": "week2.html",
-    "href": "week2.html",
-    "title": "MCMC and Stan",
-    "section": "",
-    "text": "Welcome back!\nPlan for today:\n\nMCMC\nGetting started with Stan in Python\n\nRecap from last week:\nBayesian inference: Statistical inference resulting in probabilities\nWhy in general? Probability is expressive, old and decomposes nicely\nWhy in biology? Hierarchical regression models with ODEs\nThe big challenge Integrating high dimensional probability functions\n\n\n\n\n\nIn A rule for evaluating the target function and maybe its gradients\nOut: A Markov Chain of numbers that you can do Monte Carlo integration with.\n\n\n\n\n\n\nOne random variable \\(X\\) with probability density function \\(density\\).\nAka a “one-dimensional parameter space”.\nEvaluating \\(density(x)\\) for a given value \\(x\\) (aka “point in parameter space”) is easy.\nCalculating the area under a region of the \\(density\\) curve (aka “the probability mass”) is expensive.\nThis is annoying, we need to know that!\n\n\n\nGenerate a series \\(x_1, ..., x_i,..., x_n\\) where every number depends on the previous number(s), i.e. a Markov chain.\nTo calculate \\(x_{i+1}\\), generate a random number and take into account \\(density(x_i)\\). 1\n1 This is the interesting and tricky bit!\nIf this works, with a long enough series of numbers we get something like this:\n\n\n\n\n\n\n\nSuccess condition for MCMC\n\n\n\nThe numbers from the Markov chain have to approximately agree with the target density function, i.e. in any region the number of dots is approximately proportional to the area under the curve.\n\n\nNow we can do Monte Carlo integration, i.e. approximate the area under a region of curve by counting the red dots in that region.\n\n\n\n\nThe first (I think?) MCMC algorithm. Original paper: Metropolis et al. (1953).2\n2 Metropolis was first author but didn’t do any work! That was Arianna Rosenbluth (programming) plus Marshall Rosenbluth & Edward Teller (maths)Generates Markov chains that provably agree with arbitrary target density functions (in the asymptotic limit).\nRoughly how it works:\n\nChoose candidate by randomly perturbing previous point \\(x_i\\)\nAccept or reject candidate randomly according to the ratio \\(\\frac{density(candidate)}{density(x_i)}\\)\n\\(x_{i+1}\\) is candidate if accept else x_i\n\nVisualisation\nDoesn’t work for more than ~10 dimensional parameter spaces.\n\n\n\nBig picture: MCMC that works for large parameter spaces.\nKey innovation: travel through parameter space quickly using gradients.\nIllustration:\n\nA better illustration\n\n\n\n\n\n\nA small but important detail:\n\n\n\nTo decide how hard to flick the ball and how precisely to calculate its trajectory for a particular case, adaptation is required, i.e. running the algorithm in warm-up mode for a bit and learning by trial and error. How best to do adaptation is an important open question.\n\n\nLimitations:\n\nNo discrete parameters\nPerforms badly when the target (log-scale) density function is wiggly.\n\n\n\nBetancourt (2018b)\nBetancourt (2018a)\nBeskos et al. (2010)\nAndrieu and Andrieu (2003)\n\n\n\n\n\nStan is:\n\nA language for specifying probability density functions as Stan programs.\nA compiler that turns Stan programs into instructions for inference engines.\nAn inference engine implementing adaptive HMC and some other algorithms.\nA library of functions for calculating the gradients of interesting probability density functions.\nSome interfaces for popular computer tools:\n\nCommand line: cmdstan\nPython:\n\ncmdstanpy\npystan\n\nR:\n\ncmdstanr\nRstan\n\n\n\n\n\nAlternatives: pymc, blackjax, Turing.jl tensorflow probability\nOverview as of 2023: Štrumbelj et al. (2023).\nWhy I like Stan:\n\nBig, active and knowledgeable community (most important reason)\nFeatureful (complex numbers, fast solvers, up-to-date diagnostics)\nFast (for CPU-bound, general purpose adaptive HMC)\n\n\n\n\n\nInstall cmdstanpy\npip install cmdstanpy\nUse cmdstanpy to install the rest of Stan\npython -m cmdstanpy.install_cmdstan --cores 2\nI like to store Stan outputs using the library arviz. It also makes nice plots.\npip install arviz\n\n\nA Stan program consists of function definitions, variable declarations and statements, organised into {...} delimited blocks, e.g.\ndata {\n  real y;  # a variable declaration\n}\nmodel {\n  y ~ normal(0, 1.4);  # a statement\n}\nThe purpose of a Stan program is to define the probability density for any combination of data and parameters.\nIt is ok for there to be no parameters:\ntransformed data {\n  real y = 2;  # this is both a statement and a declaration!\n}\nmodel {\n  y ~ normal(0, 1.4);  # the total density is N(2 | 0, 1.4) = 0.103\n}\nor no data:\nparameters {\n  real alpha;\n}\nmodel {\n  alpha ~ normal(0, 1.4);  # Stan can find the density for any alpha\n}\n\n\n\n\n\nUse standard Python tools to make a dictionary mapping data variables to inputs e.g.\nmy_stan_input = {\"y\": 2}\n(Optional) Save the input as a json file:\nimport json\nwith open(\"my_stan_input.json\", \"w\") as f:\n    json.dump(my_stan_input, f)\n\n\n\nInstantiate a CmdstanModel\nfrom cmdstanpy import CmdStanModel\nmy_model = CmdStanModel(stan_file=\"my_stan_program.stan\")\nCmdstanpy will use Stan’s compiler to create .hpp and executable files.\n\n\n\nUse the method CmdStanModel.sample to trigger adaptive HMC.\nmy_mcmc_results = my_model.sample(data=my_stan_input)\n\n\n\nUse the methods CmdStanMCMC.diagnose and CmdStanMCMC.summary for quick diagnostics.\nsummary = my_mcmc_results.summary()\ndiagnostics = my_mcmc_results.diagnose()\n\n\n\nConvert to arviz InferenceData and save\nimport arviz\nmy_idata = arviz.from_cmdstanpy(my_mcmc_results)\nmy_idata.to_json(\"my_arviz_idata.json\")\n\n\n\n\nCmdstanpy docs\nStan reference manual\nStan functions reference\nStan User’s guide\nstan-dev github organisation",
+    "text": "Plan for today:\nRecap from last week:\nMCMC: Monte Carlo Integration using Markov Chains\nStan: A probabilistic programming framework",
     "crumbs": [
       "Course materials",
-      "MCMC and Stan"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "week2.html#introduction",
-    "href": "week2.html#introduction",
-    "title": "MCMC and Stan",
-    "section": "",
-    "text": "Welcome back!\nPlan for today:\n\nMCMC\nGetting started with Stan in Python\n\nRecap from last week:\nBayesian inference: Statistical inference resulting in probabilities\nWhy in general? Probability is expressive, old and decomposes nicely\nWhy in biology? Hierarchical regression models with ODEs\nThe big challenge Integrating high dimensional probability functions",
+    "objectID": "week3.html#hatr",
+    "href": "week3.html#hatr",
+    "title": "What to do after MCMC",
+    "section": "\\(\\hat{R}\\)",
+    "text": "\\(\\hat{R}\\)\n\\(\\hat{R}\\) is a number that tells you:\n\nDo my chains agree with each other?\nAre my chains stationary?\n\n\\(\\hat{R}\\) should be close to 1. If not, you need to change something!\nFind out more: Vehtari et al. (2021)",
     "crumbs": [
       "Course materials",
-      "MCMC and Stan"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "week2.html#mcmc",
-    "href": "week2.html#mcmc",
-    "title": "MCMC and Stan",
-    "section": "",
-    "text": "In A rule for evaluating the target function and maybe its gradients\nOut: A Markov Chain of numbers that you can do Monte Carlo integration with.\n\n\n\n\n\n\nOne random variable \\(X\\) with probability density function \\(density\\).\nAka a “one-dimensional parameter space”.\nEvaluating \\(density(x)\\) for a given value \\(x\\) (aka “point in parameter space”) is easy.\nCalculating the area under a region of the \\(density\\) curve (aka “the probability mass”) is expensive.\nThis is annoying, we need to know that!\n\n\n\nGenerate a series \\(x_1, ..., x_i,..., x_n\\) where every number depends on the previous number(s), i.e. a Markov chain.\nTo calculate \\(x_{i+1}\\), generate a random number and take into account \\(density(x_i)\\). 1\n1 This is the interesting and tricky bit!\nIf this works, with a long enough series of numbers we get something like this:\n\n\n\n\n\n\n\nSuccess condition for MCMC\n\n\n\nThe numbers from the Markov chain have to approximately agree with the target density function, i.e. in any region the number of dots is approximately proportional to the area under the curve.\n\n\nNow we can do Monte Carlo integration, i.e. approximate the area under a region of curve by counting the red dots in that region.\n\n\n\n\nThe first (I think?) MCMC algorithm. Original paper: Metropolis et al. (1953).2\n2 Metropolis was first author but didn’t do any work! That was Arianna Rosenbluth (programming) plus Marshall Rosenbluth & Edward Teller (maths)Generates Markov chains that provably agree with arbitrary target density functions (in the asymptotic limit).\nRoughly how it works:\n\nChoose candidate by randomly perturbing previous point \\(x_i\\)\nAccept or reject candidate randomly according to the ratio \\(\\frac{density(candidate)}{density(x_i)}\\)\n\\(x_{i+1}\\) is candidate if accept else x_i\n\nVisualisation\nDoesn’t work for more than ~10 dimensional parameter spaces.\n\n\n\nBig picture: MCMC that works for large parameter spaces.\nKey innovation: travel through parameter space quickly using gradients.\nIllustration:\n\nA better illustration\n\n\n\n\n\n\nA small but important detail:\n\n\n\nTo decide how hard to flick the ball and how precisely to calculate its trajectory for a particular case, adaptation is required, i.e. running the algorithm in warm-up mode for a bit and learning by trial and error. How best to do adaptation is an important open question.\n\n\nLimitations:\n\nNo discrete parameters\nPerforms badly when the target (log-scale) density function is wiggly.\n\n\n\nBetancourt (2018b)\nBetancourt (2018a)\nBeskos et al. (2010)\nAndrieu and Andrieu (2003)",
+    "objectID": "week3.html#divergent-transitions",
+    "href": "week3.html#divergent-transitions",
+    "title": "What to do after MCMC",
+    "section": "Divergent transitions",
+    "text": "Divergent transitions\nThis diagnostic is specific to HMC.\nIt answers the question did the trajectory ODE solver fail?\nUsually the reason for the failure is a target distribution with very varying optimal step sizes.\nSometimes the location of the divergent transitions gives clues about the reason for the failure.\nFind out more: Betancourt (2017).",
     "crumbs": [
       "Course materials",
-      "MCMC and Stan"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "week2.html#stan",
-    "href": "week2.html#stan",
-    "title": "MCMC and Stan",
-    "section": "",
-    "text": "Stan is:\n\nA language for specifying probability density functions as Stan programs.\nA compiler that turns Stan programs into instructions for inference engines.\nAn inference engine implementing adaptive HMC and some other algorithms.\nA library of functions for calculating the gradients of interesting probability density functions.\nSome interfaces for popular computer tools:\n\nCommand line: cmdstan\nPython:\n\ncmdstanpy\npystan\n\nR:\n\ncmdstanr\nRstan\n\n\n\n\n\nAlternatives: pymc, blackjax, Turing.jl tensorflow probability\nOverview as of 2023: Štrumbelj et al. (2023).\nWhy I like Stan:\n\nBig, active and knowledgeable community (most important reason)\nFeatureful (complex numbers, fast solvers, up-to-date diagnostics)\nFast (for CPU-bound, general purpose adaptive HMC)",
+    "objectID": "week3.html#very-quick-decision-theory",
+    "href": "week3.html#very-quick-decision-theory",
+    "title": "What to do after MCMC",
+    "section": "Very quick decision theory",
+    "text": "Very quick decision theory\nLoss function: If the observation is \\(y\\) and the model says \\(p(y) = z\\), how bad is that?\nTo choose a model, choose a loss function, then try to minimise estimated expected loss.\n\n\n\n\n\n\nImportant\n\n\n\nWhich loss function is best depends on the problem!\n\n\nTo estimate expected loss, make some predictions.\n\n\n\n\n\n\nImportant\n\n\n\nIn order to be useful for estimating model performance, predictions must be relevant to the evaluation context that matters.\ni.e. not from the training data, not from an already-observed sample, not from the past, etc…\n\n\nFind out more: Vehtari and Ojanen (2012)",
     "crumbs": [
       "Course materials",
-      "MCMC and Stan"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "week2.html#getting-started-with-stan-in-python",
-    "href": "week2.html#getting-started-with-stan-in-python",
-    "title": "MCMC and Stan",
-    "section": "",
-    "text": "Install cmdstanpy\npip install cmdstanpy\nUse cmdstanpy to install the rest of Stan\npython -m cmdstanpy.install_cmdstan --cores 2\nI like to store Stan outputs using the library arviz. It also makes nice plots.\npip install arviz\n\n\nA Stan program consists of function definitions, variable declarations and statements, organised into {...} delimited blocks, e.g.\ndata {\n  real y;  # a variable declaration\n}\nmodel {\n  y ~ normal(0, 1.4);  # a statement\n}\nThe purpose of a Stan program is to define the probability density for any combination of data and parameters.\nIt is ok for there to be no parameters:\ntransformed data {\n  real y = 2;  # this is both a statement and a declaration!\n}\nmodel {\n  y ~ normal(0, 1.4);  # the total density is N(2 | 0, 1.4) = 0.103\n}\nor no data:\nparameters {\n  real alpha;\n}\nmodel {\n  alpha ~ normal(0, 1.4);  # Stan can find the density for any alpha\n}\n\n\n\n\n\nUse standard Python tools to make a dictionary mapping data variables to inputs e.g.\nmy_stan_input = {\"y\": 2}\n(Optional) Save the input as a json file:\nimport json\nwith open(\"my_stan_input.json\", \"w\") as f:\n    json.dump(my_stan_input, f)\n\n\n\nInstantiate a CmdstanModel\nfrom cmdstanpy import CmdStanModel\nmy_model = CmdStanModel(stan_file=\"my_stan_program.stan\")\nCmdstanpy will use Stan’s compiler to create .hpp and executable files.\n\n\n\nUse the method CmdStanModel.sample to trigger adaptive HMC.\nmy_mcmc_results = my_model.sample(data=my_stan_input)\n\n\n\nUse the methods CmdStanMCMC.diagnose and CmdStanMCMC.summary for quick diagnostics.\nsummary = my_mcmc_results.summary()\ndiagnostics = my_mcmc_results.diagnose()\n\n\n\nConvert to arviz InferenceData and save\nimport arviz\nmy_idata = arviz.from_cmdstanpy(my_mcmc_results)\nmy_idata.to_json(\"my_arviz_idata.json\")\n\n\n\n\nCmdstanpy docs\nStan reference manual\nStan functions reference\nStan User’s guide\nstan-dev github organisation",
+    "objectID": "week3.html#log-likelihood",
+    "href": "week3.html#log-likelihood",
+    "title": "What to do after MCMC",
+    "section": "Log likelihood",
+    "text": "Log likelihood\nA good default loss function:\n\\[\nloss(y, p(y)) = -\\ln{p(y)}\n\\]\nOut of sample log likelihood can often be approximated cheaply: see Vehtari, Gelman, and Gabry (2017).\nFind out more: (Landes and Williamson 2013, sec. 2.3)",
     "crumbs": [
       "Course materials",
-      "MCMC and Stan"
+      "What to do after MCMC"
     ]
   }
 ]

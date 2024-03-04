@@ -120,7 +120,7 @@ idata
 ```
 
 The function `az.summary` lets us look at some useful summary statistics,
-including $\hat{R}$ and divergent transitions.
+including $\hat{R}$, divergent transitions and MCSE.
 
 The variable `lp`, which you can find in the group `sample_stats` is the
 model's total log probability density. It's not very meaningful on its own,
@@ -131,23 +131,30 @@ divergent transitions.
 az.summary(idata.sample_stats, var_names=["lp", "diverging"])
 ```
 
-Sometimes it's useful to check the convergence of individual parameters. This
-can be done by pointing `az.summary` at the group where the parameters of
-interest live. In this case the group is called `posterior`.
+Sometimes it's useful to summarise individual parameters. This can be done by
+pointing `az.summary` at the group where the parameters of interest live. In
+this case the group is called `posterior`.
 
 ```{python}
 az.summary(idata.posterior, var_names=["sigma", "g"])
 ```
 
-The function `az.loo` performs approximate leave-one-out cross validation, which can be useful for evaluating how well the model might make predictions.
+The function `az.loo` performs approximate leave-one-out cross validation, which
+can be useful for evaluating how well the model might make predictions. Watch
+out for the `warning` column, which can tell you if the approximation is likely
+to be incorrect.
 
 ```{python}
 az.loo(idata, var_name="y", pointwise=True)
-
 ```
 
+The function `az.compare` is useful for comparing different out of sample log
+likelihood estimates.
+
 ```{python}
+
 idata.log_likelihood["fake"] = xr.DataArray(
+    # generate some fake log likelihoods
     np.random.normal(0, 2, [4, 500, 919]),
     coords=idata.log_likelihood.coords,
     dims=idata.log_likelihood.dims
@@ -160,3 +167,5 @@ az.compare(
 )
 
 ```
+
+az.plot_ppc(j)
