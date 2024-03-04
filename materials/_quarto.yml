@@ -12,6 +12,7 @@ project:
     - week1.md
     - week2.md
     - week3.qmd
+    - metropolis-hastings.qmd
 
 website:
   title: "Bayesian Statistics for Computational Biology"
@@ -31,6 +32,7 @@ website:
         - week1.md
         - week2.md
         - week3.qmd
+        - metropolis-hastings.qmd
 
 format:
   html:
