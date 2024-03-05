@@ -235,6 +235,13 @@ Here is how you'd call the proposal function
 prop_mu, prop_sigma = proposal_multi(current_mu, current_sigma)
 ```
 
+the accept_reject probability should also be updated to account
+for the log-probability
+
+```
+accept_reject = np.exp(prob_prop - prob_current)
+```
+
 You should sample a 95% interval including a $\mu = 5$ 
 and a $\sigma = 0.2$. This may be difficult at first to sample and
 I would recommend initialising at these values.  
