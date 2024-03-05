@@ -6,10 +6,8 @@ Welcome back!
 
 Plan for today:
 
-1. [Problem Statement](#why-integrals)
-2. [Markov Chains](#markov-chains)
-4. [Metropolis-Hastings explained](#metropolis-hastings)
-5. [What are the limitations?](#metropolis-hastings-limitations)
+1. [Markov Chains](#markov-chains)
+2. [Metropolis-Hastings explained](#metropolis-hastings)
 
 Recap from last week:
 
@@ -213,7 +211,8 @@ plt.plot(draw, samples)
 ### Part 2: determining mean and standard deviation from data
 I suggest using logs due to numerical issues.
 Here's an example function which you can use to evaluate 
-the probability of the data.
+the probability of the [data](https://github.com/biosustain/bayesian_statistics_for_computational_biology/blob/main/data/metropolis_hastings_example.csv).
+
 ```{python}
 def eval_prob(data, mu, sigma):
     return np.log(norm.pdf(data,mu,sigma)).sum()
