@@ -211,6 +211,44 @@ plt.plot(draw, samples)
 ```
 
 ### Part 2: determining mean and standard deviation from data
+I suggest using logs due to numerical issues.
+Here's an example function which you can use to evaluate 
+the probability of the data.
+```{python}
+def eval_prob(data, mu, sigma):
+    return np.log(norm.pdf(data,mu,sigma)).sum()
+```
 
-## Hyperspheres in hyperspace don't make much sense
-Why volume in higher dimensions is non-intuitive.
+Here's also a multivariate random number generator to generate
+proposals.
+
+```{python}
+def proposal_multi(mu, sigma):
+    mean = [mu, sigma]
+    cov = [[0.2, 0], [0, 0.2]]  # diagonal covariance
+    return np.random.multivariate_normal(mean, cov, 1)[0]
+
+```
+
+Here is how you'd call the proposal function
+```
+prop_mu, prop_sigma = proposal_multi(current_mu, current_sigma)
+```
+
+You should sample a 95% interval including a $\mu = 5$ 
+and a $\sigma = 0.2$. This may be difficult at first to sample and
+I would recommend initialising at these values.  
+
+## Volume in hyperspace don't make much sense
+
+Given an n-dimensional cube of length=2 you place spheres
+of diameter=1 in each of the corners and then place another
+sphere in the middle.
+
+How does the size of the middle sphere change as dimensions increase?
+
+![](img/dimension_sphere_diagram.png)
+
+### Radius of middle sphere as dimension increases
+
+![](img/dimension_plot.png)
