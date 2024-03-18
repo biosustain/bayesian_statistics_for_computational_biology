@@ -3,7 +3,6 @@
 Plan for today:
 
 - After MCMC: [diagnostics](#mcmc-diagnostics), [model evaluation](#model-evaluation), [results](#Results)
-- Code your own Metropolis-Hastings sampler
 
 Recap from last week:
 
@@ -48,7 +47,28 @@ Find out more:
 
 # Model evaluation
 
-## Very quick decision theory
+## Retrospective 'predictive' checks
+
+**Predictive distribution**: what a model that can replicate its measurements
+says about those measurements, i.e. $p(y^{rep})$.
+
+It's very useful to check these things:
+
+- The prior predictive distribution should not allocate much probability mass to
+  replicated measurements that are obviously impossible.
+
+- If any actual measurements lie in a region with low prior predictive
+  probability (e.g. if measurement $i$ is too low so that $p(y^rep_i>y_i) =
+  0.99$), that shows that the prior model is inconsistent with the measurements.
+
+- If there are systematic differences between the posterior predictive
+  distribution and the observed measurements, that is a sign that the model is
+  inconsistent with the measurements.
+
+Since predictive checking depends on pattern-matching it is often a good idea to
+use graphs for it.
+
+## Scoring models with loss functions
 
 **Loss function**: If the observation is $y$ and the model says $p(y) = z$, how
 bad is that?
@@ -89,7 +109,6 @@ Out of sample log likelihood can often be approximated cheaply: see
 
 Find out more: [@landesObjectiveBayesianismMaximum2013, section 2.3] 
 
-
 # Results
 
 Some useful summary statistics:
@@ -100,26 +119,51 @@ Mean | "What does the model think is the most likely value"
 Standard deviation | "How sure is my model about this?"
 Quantile n | "What is x s.t. my model is n% sure that the quantity is at least x?"
 
-Do I have enough samples? To find out, calculate the [Monte Carlo Standard Error](https://mc-stan.org/docs/reference-manual/effective-sample-size.html#estimation-of-mcmc-standard-error).
+Do I have enough samples? To find out, calculate the [Monte Carlo standard error](https://mc-stan.org/docs/reference-manual/effective-sample-size.html#estimation-of-mcmc-standard-error).
 
 :::{.callout-important}
-MCSE can vary for different statistics relating to the same quantity
+Monte Carlo standard error can vary for different statistics relating to the same quantity
 :::
 
 # Example
 
 We'll go through some diagnostics using [arviz](https://python.arviz.org).
 
+Step one is to load some data. Rather than going through a whole modelling
+workflow, we'll just take one of the example MCMC outputs that arviz provides
+via the function [`load_arviz_data`](https://python.arviz.org/en/stable/api/
+generated/arviz.load_arviz_data.html).
+
+This particular MCMC output has to do with measurements of soil radioactivity in
+the USA. You can read more about it [here](https://docs.pymc.io/notebooks/multilevel_modeling.html).
+
 ```{python}
 import arviz as az
-import numpy as np
-import xarray as xr
+import numpy as np  # numpy is for numerical programming
+import xarray as xr  # xarray is for manipulating n dimensional tables; arviz uses it a lot! 
 
 idata = az.load_arviz_data("radon")
 idata
 ```
 
-The function `az.summary` lets us look at some useful summary statistics,
+Arviz provides a data structure called [`InferenceData`](https://
+python.arviz.org/en/latest/api/inference_data.html) which it uses for storing
+MCMC outputs. It's worth getting to know it: there is some helpful explanation
+[here](https://python.arviz.org/en/latest/schema/schema.html). 
+
+At a high level, an `InferenceData` is a container for several xarray
+`Dataset` objects called 'groups'. Each group contains xarray [`DataArray`]
+(https:// docs.xarray.dev/ en/stable/generated/xarray.DataArray.html) objects
+called 'variables'. Each variable contains a rectangular array of values,
+plus the shape of the values ('dimensions') and labels for the dimensions
+('coordinates').
+
+For example, if you click on the dropdown arrows above you will see that
+the group `posterior` contains a variable called `a_county` that has three
+dimensions called `chain`, `draw` and `County`. There are 85 counties and the
+first one is labelled `'AITKIN'`.
+
+The function [`az.summary`](https://python.arviz.org/en/latest/api/generated/arviz.summary.html) lets us look at some useful summary statistics,
 including $\hat{R}$, divergent transitions and MCSE.
 
 The variable `lp`, which you can find in the group `sample_stats` is the
@@ -139,10 +183,29 @@ this case the group is called `posterior`.
 az.summary(idata.posterior, var_names=["sigma", "g"])
 ```
 
+In this case there were no post-warmup diverging transitions, and the $\hat{R}$
+statistic for the `lp` variable is pretty close to 1: great!
+
+Now we can start evaluating the model. First we check to see whether replicated
+measurements from the model's posterior predictive distribution broadly agree
+with the observed measurements, using the arviz function [`plot_lm`](https://python.arviz.org/en/latest/api/generated/arviz.plot_lm.html#arviz.plot_lm):
+
+```{python}
+az.style.use("arviz-doc")
+az.plot_lm(
+    y=idata.observed_data["y"],
+    x=idata.observed_data["obs_id"],
+    y_hat=idata.posterior_predictive["y"],
+    figsize=[12, 5],
+    grid=False
+);
+```
+
 The function `az.loo` performs approximate leave-one-out cross validation, which
 can be useful for evaluating how well the model might make predictions. Watch
 out for the `warning` column, which can tell you if the approximation is likely
-to be incorrect.
+to be incorrect. It's usually a good idea to set the `pointwise` argument to
+`True`, as this allows for more detailed analysis at the per-observation level.
 
 ```{python}
 az.loo(idata, var_name="y", pointwise=True)
@@ -159,13 +222,19 @@ idata.log_likelihood["fake"] = xr.DataArray(
     coords=idata.log_likelihood.coords,
     dims=idata.log_likelihood.dims
 )
-az.compare(
+comparison = az.compare(
     {
         "real": az.loo(idata, var_name="y"), 
         "fake": az.loo(idata, var_name="fake")
     }
 )
+comparison
 
 ```
 
-az.plot_ppc(j)
+The function [`az.plot_compare`](https://python.arviz.org/en/latest/api/generated/arviz.plot_compare.html) shows these results on a nice graph:
+
+```{python}
+az.plot_compare(comparison);
+    
+```

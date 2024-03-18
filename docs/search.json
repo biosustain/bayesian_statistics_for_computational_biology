@@ -1,90 +1,68 @@
 [
   {
-    "objectID": "metropolis-hastings.html",
-    "href": "metropolis-hastings.html",
-    "title": "Metropolis Hastings",
+    "objectID": "week3.html",
+    "href": "week3.html",
+    "title": "What to do after MCMC",
     "section": "",
-    "text": "Welcome back!\nPlan for today:\n\nProblem Statement\nMarkov Chains\nMetropolis-Hastings explained\nWhat are the limitations?\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
+    "text": "Plan for today:\nRecap from last week:\nMCMC: Monte Carlo Integration using Markov Chains\nStan: A probabilistic programming framework",
     "crumbs": [
       "Course materials",
-      "Metropolis Hastings"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "metropolis-hastings.html#introduction",
-    "href": "metropolis-hastings.html#introduction",
-    "title": "Metropolis Hastings",
-    "section": "",
-    "text": "Welcome back!\nPlan for today:\n\nProblem Statement\nMarkov Chains\nMetropolis-Hastings explained\nWhat are the limitations?\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
+    "objectID": "week3.html#hatr",
+    "href": "week3.html#hatr",
+    "title": "What to do after MCMC",
+    "section": "\\(\\hat{R}\\)",
+    "text": "\\(\\hat{R}\\)\n\\(\\hat{R}\\) is a number that tells you:\n\nDo my chains agree with each other?\nAre my chains stationary?\n\n\\(\\hat{R}\\) should be close to 1. If not, you need to change something!\nFind out more: Vehtari et al. (2021)",
     "crumbs": [
       "Course materials",
-      "Metropolis Hastings"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "metropolis-hastings.html#mcmc",
-    "href": "metropolis-hastings.html#mcmc",
-    "title": "Metropolis Hastings",
-    "section": "MCMC",
-    "text": "MCMC",
+    "objectID": "week3.html#divergent-transitions",
+    "href": "week3.html#divergent-transitions",
+    "title": "What to do after MCMC",
+    "section": "Divergent transitions",
+    "text": "Divergent transitions\nThis diagnostic is specific to HMC.\nIt answers the question did the trajectory ODE solver fail?\nUsually the reason for the failure is a target distribution with very varying optimal step sizes.\nSometimes the location of the divergent transitions gives clues about the reason for the failure.\nFind out more: Betancourt (2017).",
     "crumbs": [
       "Course materials",
-      "Metropolis Hastings"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "metropolis-hastings.html#markov-chains",
-    "href": "metropolis-hastings.html#markov-chains",
-    "title": "Metropolis Hastings",
-    "section": "Markov Chains",
-    "text": "Markov Chains\nA Markov Chain is any process that is memoryless such that\n\\[ p(x^{i} | x^{i-1},...,x^{1}) = p(x^{i} | x^{i-1}). \\]\nFor example:\n\nThe transitions can be measured as discrete time steps with the following matrix representation\n\nimport numpy as np\nT = np.matrix([[0.1, 0.1, 0.8], [0.5, 0.1, 0.4], [0.5, 0.2, 0.3]])\nprint(T)\n\n[[0.1 0.1 0.8]\n [0.5 0.1 0.4]\n [0.5 0.2 0.3]]\n\n\nGiven an initial starting position\n\nv0 = np.matrix([0.1, 0.4, 0.5])\nprint(v0)\n\n[[0.1 0.4 0.5]]\n\n\nWe can simulate the probabilities of the next step given the transition matrix.\n\nv1 = v0*T\nprint(v1)\n\n[[0.46 0.15 0.39]]\n\n\nFollowing this again we can simulate the states after two steps\n\nv2 = v1*T\nprint(v2)\n\n[[0.316 0.139 0.545]]\n\n\nThere’s a convenient way to calculate the next step given the starting condition.\n\nprint(v0*T**2)\n\n[[0.316 0.139 0.545]]\n\n\nWhat happens if we continue doing this for a long time?\n\nprint(v0*T**100)\n\n[[0.35714286 0.14935065 0.49350649]]\n\n\nAnd how does this change when taking the next step?\n\nprint(v0*T**101)\n\n[[0.35714286 0.14935065 0.49350649]]\n\n\nThis Markov Chain has the property of being a stationary distribution. That satisfies the following\n\\[ \\pi = \\pi T. \\]\nOur objective is to estimate \\(\\pi\\), which represents the target distribution.\nThis behaviour of the Markov Chain is only satisfied if two conditions are met.\n\nThe Markov Chain is irreducible\n\nAny point in the Markov chain can be reached by any other point\n\nThe Markov Chain is aperiodic Any point can be reached by any other point in a single step",
+    "objectID": "week3.html#retrospective-predictive-checks",
+    "href": "week3.html#retrospective-predictive-checks",
+    "title": "What to do after MCMC",
+    "section": "Retrospective ‘predictive’ checks",
+    "text": "Retrospective ‘predictive’ checks\nPredictive distribution: what a model that can replicate its measurements says about those measurements, i.e. \\(p(y^{rep})\\).\nIt’s very useful to check these things:\n\nThe prior predictive distribution should not allocate much probability mass to replicated measurements that are obviously impossible.\nIf any actual measurements lie in a region with low prior predictive probability (e.g. if measurement \\(i\\) is too low so that \\(p(y^rep_i&gt;y_i) =\n0.99\\)), that shows that the prior model is inconsistent with the measurements.\nIf there are systematic differences between the posterior predictive distribution and the observed measurements, that is a sign that the model is inconsistent with the measurements.\n\nSince predictive checking depends on pattern-matching it is often a good idea to use graphs for it.",
     "crumbs": [
       "Course materials",
-      "Metropolis Hastings"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "metropolis-hastings.html#markov-chain-monte-carlo",
-    "href": "metropolis-hastings.html#markov-chain-monte-carlo",
-    "title": "Metropolis Hastings",
-    "section": "Markov Chain Monte Carlo",
-    "text": "Markov Chain Monte Carlo\nIf we are able to draw samples from a Markov Chain that satisfies these properties we can generate samples from the stationary proposal distribution. After drawing samples from the sample distribution we can investigate the quantities of interest using Monte Carlo integration (read: counting samples).\nOne property that is not required for a Markov Chain but satisfies the above two properties is the detailed balance. This is not a requirement, but it’s pretty easy to define a detailed balance rather than to define general balance. This ensures that the Markov chain is reversible, in other words\n\\[ \\pi(x)*T(x'|x) = \\pi(x')*T(x|x')\\].\nIf we define a reducible process it is defined to be irreducible and aperiodic by default. It is a periodic because you can always go back, and irreducible because a region cannot be entered if there is no way of returning.\nThe process of generating a Markov Chain with these properties means that we know we are sampling from a stationary target distribution, if we have enough samples.",
+    "objectID": "week3.html#scoring-models-with-loss-functions",
+    "href": "week3.html#scoring-models-with-loss-functions",
+    "title": "What to do after MCMC",
+    "section": "Scoring models with loss functions",
+    "text": "Scoring models with loss functions\nLoss function: If the observation is \\(y\\) and the model says \\(p(y) = z\\), how bad is that?\nTo choose a model, choose a loss function, then try to minimise estimated expected loss.\n\n\n\n\n\n\nImportant\n\n\n\nWhich loss function is best depends on the problem!\n\n\nTo estimate expected loss, make some predictions.\n\n\n\n\n\n\nImportant\n\n\n\nIn order to be useful for estimating model performance, predictions must be relevant to the evaluation context that matters.\ni.e. not from the training data, not from an already-observed sample, not from the past, etc…\n\n\nFind out more: Vehtari and Ojanen (2012)",
     "crumbs": [
       "Course materials",
-      "Metropolis Hastings"
+      "What to do after MCMC"
     ]
   },
   {
-    "objectID": "metropolis-hastings.html#going-from-discrete-to-continuous",
-    "href": "metropolis-hastings.html#going-from-discrete-to-continuous",
-    "title": "Metropolis Hastings",
-    "section": "Going from discrete to continuous",
-    "text": "Going from discrete to continuous\nRather than the previous graph networks described before we can expand this to the continuous number line.\nNote: This isn’t always a possibility to transition between discrete and continuous number lines, it just works out for this case\nRather than sampling from \\(\\pi(x)\\), representing the discrete case, we will change the notation to \\(p(x)\\). And the transition kernel, rather than a matrix \\(T(x'|x)\\) will be represented by \\(K(x'|x).\\)\n\nMetropolis-Hastings\nMetropolis-Hastings enforces the reversibility constraint using the accept-reject function\n\\[\nA(x,x') = min(1, \\frac{p(x')g(x|x')}{p(x)g(x'|x)})\n\\]\nand often, a symmetric proposal distribution, e.g.\n\\[\ng(x'|x) = N(x, \\sigma).\n\\]\nThe resulting kernel is represented as\n\\[\nK(x'|x) = g(x'|x)*A(x,x').\n\\]\nThe accept-reject function, and the symmetric proposal distribution were chosen to satisfy the detailed balance function\n\\[\np(x)g(x'|x)A(x,x') = p(x')g(x|x')A(x,x').\n\\]\nTherefore, if we draw samples using the Metropolis-Hastings algorithm, we draw samples from the target distribution \\(p(x)\\).",
+    "objectID": "week3.html#log-likelihood",
+    "href": "week3.html#log-likelihood",
+    "title": "What to do after MCMC",
+    "section": "Log likelihood",
+    "text": "Log likelihood\nA good default loss function:\n\\[\nloss(y, p(y)) = -\\ln{p(y)}\n\\]\nOut of sample log likelihood can often be approximated cheaply: see Vehtari, Gelman, and Gabry (2017).\nFind out more: (Landes and Williamson 2013, sec. 2.3)",
     "crumbs": [
       "Course materials",
-      "Metropolis Hastings"
-    ]
-  },
-  {
-    "objectID": "metropolis-hastings.html#coding-the-metropolis-hastings-in-practice",
-    "href": "metropolis-hastings.html#coding-the-metropolis-hastings-in-practice",
-    "title": "Metropolis Hastings",
-    "section": "Coding the Metropolis Hastings in practice",
-    "text": "Coding the Metropolis Hastings in practice\n\nPart 1: sampling from a normal distribution\nGiven a \\(p(x) = N(2, 0.5)\\) how would draw samples using the Metropolis-Hastings algorithm?\n\nChoose proposal value\nEvaluate probability ratio\nAccept-Reject\nincrement step\n\n\nDefine probability density function\n\nimport numpy as np\nfrom scipy.stats import norm\n\ndef prob(x):\n  return norm.pdf(x, 2, 0.5)\n\n\n\nDefine proposal distribution\n\ndef proposal(x):\n  return norm.rvs(x, 1, 1)[0]\n\n\n\nInitialise sampler\n\ncurrent = 0.0\nsamples = [current]\n\n\n\nSample from distribution\n\nfor i in range(10000):\n    prop = proposal(current)\n    accept_reject = prob(prop)/prob(current)\n    if accept_reject &gt; 1:\n        samples.append(prop)\n        current = prop\n    else:\n        cutoff = np.random.rand(1)[0]\n        if accept_reject &gt; cutoff:\n            samples.append(prop)\n            current = prop\n\n\n\nPlot distribution\n\nimport matplotlib.pyplot as plt\nplt.hist(samples)\n\n(array([   9.,   19.,  165.,  553., 1188., 1376., 1101.,  513.,  105.,\n          21.]),\n array([-0.05314943,  0.32707221,  0.70729385,  1.08751549,  1.46773713,\n         1.84795877,  2.22818041,  2.60840205,  2.98862369,  3.36884533,\n         3.74906698]),\n &lt;BarContainer object of 10 artists&gt;)\n\n\n\n\n\n\n\n\n\n\n\nTrace plot\n\ndraw = [draw for draw, _ in enumerate(samples)]\nplt.plot(draw, samples)\n\n\n\n\n\n\n\n\n\n\n\nPart 2: determining mean and standard deviation from data",
-    "crumbs": [
-      "Course materials",
-      "Metropolis Hastings"
-    ]
-  },
-  {
-    "objectID": "metropolis-hastings.html#hyperspheres-in-hyperspace-dont-make-much-sense",
-    "href": "metropolis-hastings.html#hyperspheres-in-hyperspace-dont-make-much-sense",
-    "title": "Metropolis Hastings",
-    "section": "Hyperspheres in hyperspace don’t make much sense",
-    "text": "Hyperspheres in hyperspace don’t make much sense\nWhy volume in higher dimensions is non-intuitive.",
-    "crumbs": [
-      "Course materials",
-      "Metropolis Hastings"
+      "What to do after MCMC"
     ]
   },
   {
@@ -319,58 +297,91 @@
     ]
   },
   {
-    "objectID": "week3.html",
-    "href": "week3.html",
-    "title": "What to do after MCMC",
+    "objectID": "metropolis-hastings.html",
+    "href": "metropolis-hastings.html",
+    "title": "Metropolis Hastings",
     "section": "",
-    "text": "Plan for today:\nRecap from last week:\nMCMC: Monte Carlo Integration using Markov Chains\nStan: A probabilistic programming framework",
+    "text": "Welcome back!\nPlan for today:\n\nProblem Statement\nMarkov Chains\nMetropolis-Hastings explained\nWhat are the limitations?\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "week3.html#hatr",
-    "href": "week3.html#hatr",
-    "title": "What to do after MCMC",
-    "section": "\\(\\hat{R}\\)",
-    "text": "\\(\\hat{R}\\)\n\\(\\hat{R}\\) is a number that tells you:\n\nDo my chains agree with each other?\nAre my chains stationary?\n\n\\(\\hat{R}\\) should be close to 1. If not, you need to change something!\nFind out more: Vehtari et al. (2021)",
+    "objectID": "metropolis-hastings.html#introduction",
+    "href": "metropolis-hastings.html#introduction",
+    "title": "Metropolis Hastings",
+    "section": "",
+    "text": "Welcome back!\nPlan for today:\n\nProblem Statement\nMarkov Chains\nMetropolis-Hastings explained\nWhat are the limitations?\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "week3.html#divergent-transitions",
-    "href": "week3.html#divergent-transitions",
-    "title": "What to do after MCMC",
-    "section": "Divergent transitions",
-    "text": "Divergent transitions\nThis diagnostic is specific to HMC.\nIt answers the question did the trajectory ODE solver fail?\nUsually the reason for the failure is a target distribution with very varying optimal step sizes.\nSometimes the location of the divergent transitions gives clues about the reason for the failure.\nFind out more: Betancourt (2017).",
+    "objectID": "metropolis-hastings.html#mcmc",
+    "href": "metropolis-hastings.html#mcmc",
+    "title": "Metropolis Hastings",
+    "section": "MCMC",
+    "text": "MCMC",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "week3.html#very-quick-decision-theory",
-    "href": "week3.html#very-quick-decision-theory",
-    "title": "What to do after MCMC",
-    "section": "Very quick decision theory",
-    "text": "Very quick decision theory\nLoss function: If the observation is \\(y\\) and the model says \\(p(y) = z\\), how bad is that?\nTo choose a model, choose a loss function, then try to minimise estimated expected loss.\n\n\n\n\n\n\nImportant\n\n\n\nWhich loss function is best depends on the problem!\n\n\nTo estimate expected loss, make some predictions.\n\n\n\n\n\n\nImportant\n\n\n\nIn order to be useful for estimating model performance, predictions must be relevant to the evaluation context that matters.\ni.e. not from the training data, not from an already-observed sample, not from the past, etc…\n\n\nFind out more: Vehtari and Ojanen (2012)",
+    "objectID": "metropolis-hastings.html#markov-chains",
+    "href": "metropolis-hastings.html#markov-chains",
+    "title": "Metropolis Hastings",
+    "section": "Markov Chains",
+    "text": "Markov Chains\nA Markov Chain is any process that is memoryless such that\n\\[ p(x^{i} | x^{i-1},...,x^{1}) = p(x^{i} | x^{i-1}). \\]\nFor example:\n\nThe transitions can be measured as discrete time steps with the following matrix representation\n\nimport numpy as np\nT = np.matrix([[0.1, 0.1, 0.8], [0.5, 0.1, 0.4], [0.5, 0.2, 0.3]])\nprint(T)\n\n[[0.1 0.1 0.8]\n [0.5 0.1 0.4]\n [0.5 0.2 0.3]]\n\n\nGiven an initial starting position\n\nv0 = np.matrix([0.1, 0.4, 0.5])\nprint(v0)\n\n[[0.1 0.4 0.5]]\n\n\nWe can simulate the probabilities of the next step given the transition matrix.\n\nv1 = v0*T\nprint(v1)\n\n[[0.46 0.15 0.39]]\n\n\nFollowing this again we can simulate the states after two steps\n\nv2 = v1*T\nprint(v2)\n\n[[0.316 0.139 0.545]]\n\n\nThere’s a convenient way to calculate the next step given the starting condition.\n\nprint(v0*T**2)\n\n[[0.316 0.139 0.545]]\n\n\nWhat happens if we continue doing this for a long time?\n\nprint(v0*T**100)\n\n[[0.35714286 0.14935065 0.49350649]]\n\n\nAnd how does this change when taking the next step?\n\nprint(v0*T**101)\n\n[[0.35714286 0.14935065 0.49350649]]\n\n\nThis Markov Chain has the property of being a stationary distribution. That satisfies the following\n\\[ \\pi = \\pi T. \\]\nOur objective is to estimate \\(\\pi\\), which represents the target distribution.\nThis behaviour of the Markov Chain is only satisfied if two conditions are met.\n\nThe Markov Chain is irreducible\n\nAny point in the Markov chain can be reached by any other point\n\nThe Markov Chain is aperiodic Any point can be reached by any other point in a single step",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "week3.html#log-likelihood",
-    "href": "week3.html#log-likelihood",
-    "title": "What to do after MCMC",
-    "section": "Log likelihood",
-    "text": "Log likelihood\nA good default loss function:\n\\[\nloss(y, p(y)) = -\\ln{p(y)}\n\\]\nOut of sample log likelihood can often be approximated cheaply: see Vehtari, Gelman, and Gabry (2017).\nFind out more: (Landes and Williamson 2013, sec. 2.3)",
+    "objectID": "metropolis-hastings.html#markov-chain-monte-carlo",
+    "href": "metropolis-hastings.html#markov-chain-monte-carlo",
+    "title": "Metropolis Hastings",
+    "section": "Markov Chain Monte Carlo",
+    "text": "Markov Chain Monte Carlo\nIf we are able to draw samples from a Markov Chain that satisfies these properties we can generate samples from the stationary proposal distribution. After drawing samples from the sample distribution we can investigate the quantities of interest using Monte Carlo integration (read: counting samples).\nOne property that is not required for a Markov Chain but satisfies the above two properties is the detailed balance. This is not a requirement, but it’s pretty easy to define a detailed balance rather than to define general balance. This ensures that the Markov chain is reversible, in other words\n\\[ \\pi(x)*T(x'|x) = \\pi(x')*T(x|x')\\].\nIf we define a reducible process it is defined to be irreducible and aperiodic by default. It is a periodic because you can always go back, and irreducible because a region cannot be entered if there is no way of returning.\nThe process of generating a Markov Chain with these properties means that we know we are sampling from a stationary target distribution, if we have enough samples.",
     "crumbs": [
       "Course materials",
-      "What to do after MCMC"
+      "Metropolis Hastings"
+    ]
+  },
+  {
+    "objectID": "metropolis-hastings.html#going-from-discrete-to-continuous",
+    "href": "metropolis-hastings.html#going-from-discrete-to-continuous",
+    "title": "Metropolis Hastings",
+    "section": "Going from discrete to continuous",
+    "text": "Going from discrete to continuous\nRather than the previous graph networks described before we can expand this to the continuous number line.\nNote: This isn’t always a possibility to transition between discrete and continuous number lines, it just works out for this case\nRather than sampling from \\(\\pi(x)\\), representing the discrete case, we will change the notation to \\(p(x)\\). And the transition kernel, rather than a matrix \\(T(x'|x)\\) will be represented by \\(K(x'|x).\\)\n\nMetropolis-Hastings\nMetropolis-Hastings enforces the reversibility constraint using the accept-reject function\n\\[\nA(x,x') = min(1, \\frac{p(x')g(x|x')}{p(x)g(x'|x)})\n\\]\nand often, a symmetric proposal distribution, e.g.\n\\[\ng(x'|x) = N(x, \\sigma).\n\\]\nThe resulting kernel is represented as\n\\[\nK(x'|x) = g(x'|x)*A(x,x').\n\\]\nThe accept-reject function, and the symmetric proposal distribution were chosen to satisfy the detailed balance function\n\\[\np(x)g(x'|x)A(x,x') = p(x')g(x|x')A(x,x').\n\\]\nTherefore, if we draw samples using the Metropolis-Hastings algorithm, we draw samples from the target distribution \\(p(x)\\).",
+    "crumbs": [
+      "Course materials",
+      "Metropolis Hastings"
+    ]
+  },
+  {
+    "objectID": "metropolis-hastings.html#coding-the-metropolis-hastings-in-practice",
+    "href": "metropolis-hastings.html#coding-the-metropolis-hastings-in-practice",
+    "title": "Metropolis Hastings",
+    "section": "Coding the Metropolis Hastings in practice",
+    "text": "Coding the Metropolis Hastings in practice\n\nPart 1: sampling from a normal distribution\nGiven a \\(p(x) = N(2, 0.5)\\) how would draw samples using the Metropolis-Hastings algorithm?\n\nChoose proposal value\nEvaluate probability ratio\nAccept-Reject\nincrement step\n\n\nDefine probability density function\n\nimport numpy as np\nfrom scipy.stats import norm\n\ndef prob(x):\n  return norm.pdf(x, 2, 0.5)\n\n\n\nDefine proposal distribution\n\ndef proposal(x):\n  return norm.rvs(x, 1, 1)[0]\n\n\n\nInitialise sampler\n\ncurrent = 0.0\nsamples = [current]\n\n\n\nSample from distribution\n\nfor i in range(10000):\n    prop = proposal(current)\n    accept_reject = prob(prop)/prob(current)\n    if accept_reject &gt; 1:\n        samples.append(prop)\n        current = prop\n    else:\n        cutoff = np.random.rand(1)[0]\n        if accept_reject &gt; cutoff:\n            samples.append(prop)\n            current = prop\n\n\n\nPlot distribution\n\nimport matplotlib.pyplot as plt\nplt.hist(samples)\n\n(array([   7.,   31.,  192.,  669., 1232., 1248., 1012.,  471.,  100.,\n          22.]),\n array([0.        , 0.37565749, 0.75131498, 1.12697247, 1.50262996,\n        1.87828745, 2.25394494, 2.62960243, 3.00525992, 3.38091741,\n        3.7565749 ]),\n &lt;BarContainer object of 10 artists&gt;)\n\n\n\n\n\n\n\n\n\n\n\nTrace plot\n\ndraw = [draw for draw, _ in enumerate(samples)]\nplt.plot(draw, samples)\n\n\n\n\n\n\n\n\n\n\n\nPart 2: determining mean and standard deviation from data",
+    "crumbs": [
+      "Course materials",
+      "Metropolis Hastings"
+    ]
+  },
+  {
+    "objectID": "metropolis-hastings.html#hyperspheres-in-hyperspace-dont-make-much-sense",
+    "href": "metropolis-hastings.html#hyperspheres-in-hyperspace-dont-make-much-sense",
+    "title": "Metropolis Hastings",
+    "section": "Hyperspheres in hyperspace don’t make much sense",
+    "text": "Hyperspheres in hyperspace don’t make much sense\nWhy volume in higher dimensions is non-intuitive.",
+    "crumbs": [
+      "Course materials",
+      "Metropolis Hastings"
     ]
   }
 ]
