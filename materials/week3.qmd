@@ -175,6 +175,9 @@ divergent transitions.
 az.summary(idata.sample_stats, var_names=["lp", "diverging"])
 ```
 
+In this case there were no post-warmup diverging transitions, and the $\hat{R}$
+statistic for the `lp` variable is pretty close to 1: great!
+
 Sometimes it's useful to summarise individual parameters. This can be done by
 pointing `az.summary` at the group where the parameters of interest live. In
 this case the group is called `posterior`.
@@ -182,9 +185,6 @@ this case the group is called `posterior`.
 ```{python}
 az.summary(idata.posterior, var_names=["sigma", "g"])
 ```
-
-In this case there were no post-warmup diverging transitions, and the $\hat{R}$
-statistic for the `lp` variable is pretty close to 1: great!
 
 Now we can start evaluating the model. First we check to see whether replicated
 measurements from the model's posterior predictive distribution broadly agree
@@ -201,11 +201,14 @@ az.plot_lm(
 );
 ```
 
-The function `az.loo` performs approximate leave-one-out cross validation, which
-can be useful for evaluating how well the model might make predictions. Watch
-out for the `warning` column, which can tell you if the approximation is likely
-to be incorrect. It's usually a good idea to set the `pointwise` argument to
-`True`, as this allows for more detailed analysis at the per-observation level.
+The function `az.loo` can quickly estimate a model's out of sample log
+likelihood (which we saw above is a nice default loss function), allowing a nice
+numerical comparison between models. 
+
+Watch out for the `warning` column, which can tell you if the estimation is
+likely to be incorrect. It's usually a good idea to set the `pointwise` argument
+to `True`, as this allows for more detailed analysis at the per-observation
+level.
 
 ```{python}
 az.loo(idata, var_name="y", pointwise=True)
