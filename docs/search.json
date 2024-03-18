@@ -301,7 +301,7 @@
     "href": "metropolis-hastings.html",
     "title": "Metropolis Hastings",
     "section": "",
-    "text": "Welcome back!\nPlan for today:\n\nProblem Statement\nMarkov Chains\nMetropolis-Hastings explained\nWhat are the limitations?\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
+    "text": "Welcome back!\nPlan for today:\n\nMarkov Chains\nMetropolis-Hastings explained\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
     "crumbs": [
       "Course materials",
       "Metropolis Hastings"
@@ -312,7 +312,7 @@
     "href": "metropolis-hastings.html#introduction",
     "title": "Metropolis Hastings",
     "section": "",
-    "text": "Welcome back!\nPlan for today:\n\nProblem Statement\nMarkov Chains\nMetropolis-Hastings explained\nWhat are the limitations?\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
+    "text": "Welcome back!\nPlan for today:\n\nMarkov Chains\nMetropolis-Hastings explained\n\nRecap from last week:\nWhat is MCMC trying to solve: MCMC",
     "crumbs": [
       "Course materials",
       "Metropolis Hastings"
@@ -367,18 +367,18 @@
     "href": "metropolis-hastings.html#coding-the-metropolis-hastings-in-practice",
     "title": "Metropolis Hastings",
     "section": "Coding the Metropolis Hastings in practice",
-    "text": "Coding the Metropolis Hastings in practice\n\nPart 1: sampling from a normal distribution\nGiven a \\(p(x) = N(2, 0.5)\\) how would draw samples using the Metropolis-Hastings algorithm?\n\nChoose proposal value\nEvaluate probability ratio\nAccept-Reject\nincrement step\n\n\nDefine probability density function\n\nimport numpy as np\nfrom scipy.stats import norm\n\ndef prob(x):\n  return norm.pdf(x, 2, 0.5)\n\n\n\nDefine proposal distribution\n\ndef proposal(x):\n  return norm.rvs(x, 1, 1)[0]\n\n\n\nInitialise sampler\n\ncurrent = 0.0\nsamples = [current]\n\n\n\nSample from distribution\n\nfor i in range(10000):\n    prop = proposal(current)\n    accept_reject = prob(prop)/prob(current)\n    if accept_reject &gt; 1:\n        samples.append(prop)\n        current = prop\n    else:\n        cutoff = np.random.rand(1)[0]\n        if accept_reject &gt; cutoff:\n            samples.append(prop)\n            current = prop\n\n\n\nPlot distribution\n\nimport matplotlib.pyplot as plt\nplt.hist(samples)\n\n(array([   7.,   31.,  192.,  669., 1232., 1248., 1012.,  471.,  100.,\n          22.]),\n array([0.        , 0.37565749, 0.75131498, 1.12697247, 1.50262996,\n        1.87828745, 2.25394494, 2.62960243, 3.00525992, 3.38091741,\n        3.7565749 ]),\n &lt;BarContainer object of 10 artists&gt;)\n\n\n\n\n\n\n\n\n\n\n\nTrace plot\n\ndraw = [draw for draw, _ in enumerate(samples)]\nplt.plot(draw, samples)\n\n\n\n\n\n\n\n\n\n\n\nPart 2: determining mean and standard deviation from data",
+    "text": "Coding the Metropolis Hastings in practice\n\nPart 1: sampling from a normal distribution\nGiven a \\(p(x) = N(2, 0.5)\\) how would draw samples using the Metropolis-Hastings algorithm?\n\nChoose proposal value\nEvaluate probability ratio\nAccept-Reject\nincrement step\n\n\nDefine probability density function\n\nimport numpy as np\nfrom scipy.stats import norm\n\ndef prob(x):\n  return norm.pdf(x, 2, 0.5)\n\n\n\nDefine proposal distribution\n\ndef proposal(x):\n  return norm.rvs(x, 1, 1)[0]\n\n\n\nInitialise sampler\n\ncurrent = 0.0\nsamples = [current]\n\n\n\nSample from distribution\n\nfor i in range(10000):\n    prop = proposal(current)\n    accept_reject = prob(prop)/prob(current)\n    if accept_reject &gt; 1:\n        samples.append(prop)\n        current = prop\n    else:\n        cutoff = np.random.rand(1)[0]\n        if accept_reject &gt; cutoff:\n            samples.append(prop)\n            current = prop\n\n\n\nPlot distribution\n\nimport matplotlib.pyplot as plt\nplt.hist(samples)\n\n(array([   6.,   45.,  377., 1127., 1581., 1315.,  503.,  105.,    9.,\n           2.]),\n array([0.        , 0.43380605, 0.8676121 , 1.30141815, 1.7352242 ,\n        2.16903025, 2.6028363 , 3.03664235, 3.4704484 , 3.90425445,\n        4.3380605 ]),\n &lt;BarContainer object of 10 artists&gt;)\n\n\n\n\n\n\n\n\n\n\n\nTrace plot\n\ndraw = [draw for draw, _ in enumerate(samples)]\nplt.plot(draw, samples)\n\n\n\n\n\n\n\n\n\n\n\nPart 2: determining mean and standard deviation from data\nI suggest using logs due to numerical issues. Here’s an example function which you can use to evaluate the probability of the data.\n\ndef eval_prob(data, mu, sigma):\n    return np.log(norm.pdf(data,mu,sigma)).sum()\n\nHere’s also a multivariate random number generator to generate proposals.\n\ndef proposal_multi(mu, sigma):\n    mean = [mu, sigma]\n    cov = [[0.2, 0], [0, 0.2]]  # diagonal covariance\n    return np.random.multivariate_normal(mean, cov, 1)[0]\n\nHere is how you’d call the proposal function\nprop_mu, prop_sigma = proposal_multi(current_mu, current_sigma)\nthe accept_reject probability should also be updated to account for the log-probability\naccept_reject = np.exp(prob_prop - prob_current)\nYou should sample a 95% interval including a \\(\\mu = 5\\) and a \\(\\sigma = 0.2\\). This may be difficult at first to sample and I would recommend initialising at these values.",
     "crumbs": [
       "Course materials",
       "Metropolis Hastings"
     ]
   },
   {
-    "objectID": "metropolis-hastings.html#hyperspheres-in-hyperspace-dont-make-much-sense",
-    "href": "metropolis-hastings.html#hyperspheres-in-hyperspace-dont-make-much-sense",
+    "objectID": "metropolis-hastings.html#volume-in-hyperspace-dont-make-much-sense",
+    "href": "metropolis-hastings.html#volume-in-hyperspace-dont-make-much-sense",
     "title": "Metropolis Hastings",
-    "section": "Hyperspheres in hyperspace don’t make much sense",
-    "text": "Hyperspheres in hyperspace don’t make much sense\nWhy volume in higher dimensions is non-intuitive.",
+    "section": "Volume in hyperspace don’t make much sense",
+    "text": "Volume in hyperspace don’t make much sense\nGiven an n-dimensional cube of length=2 you place spheres of diameter=1 in each of the corners and then place another sphere in the middle.\nHow does the size of the middle sphere change as dimensions increase?\n\n\nRadius of middle sphere as dimension increases",
     "crumbs": [
       "Course materials",
       "Metropolis Hastings"

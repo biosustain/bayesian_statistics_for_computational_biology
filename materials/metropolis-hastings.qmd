@@ -6,10 +6,8 @@ Welcome back!
 
 Plan for today:
 
-1. [Problem Statement](#why-integrals)
-2. [Markov Chains](#markov-chains)
-4. [Metropolis-Hastings explained](#metropolis-hastings)
-5. [What are the limitations?](#metropolis-hastings-limitations)
+1. [Markov Chains](#markov-chains)
+2. [Metropolis-Hastings explained](#metropolis-hastings)
 
 Recap from last week:
 
@@ -211,6 +209,52 @@ plt.plot(draw, samples)
 ```
 
 ### Part 2: determining mean and standard deviation from data
+I suggest using logs due to numerical issues.
+Here's an example function which you can use to evaluate 
+the probability of the [data](https://github.com/biosustain/bayesian_statistics_for_computational_biology/blob/main/data/metropolis_hastings_example.csv).
 
-## Hyperspheres in hyperspace don't make much sense
-Why volume in higher dimensions is non-intuitive.
+```{python}
+def eval_prob(data, mu, sigma):
+    return np.log(norm.pdf(data,mu,sigma)).sum()
+```
+
+Here's also a multivariate random number generator to generate
+proposals.
+
+```{python}
+def proposal_multi(mu, sigma):
+    mean = [mu, sigma]
+    cov = [[0.2, 0], [0, 0.2]]  # diagonal covariance
+    return np.random.multivariate_normal(mean, cov, 1)[0]
+
+```
+
+Here is how you'd call the proposal function
+```
+prop_mu, prop_sigma = proposal_multi(current_mu, current_sigma)
+```
+
+the accept_reject probability should also be updated to account
+for the log-probability
+
+```
+accept_reject = np.exp(prob_prop - prob_current)
+```
+
+You should sample a 95% interval including a $\mu = 5$ 
+and a $\sigma = 0.2$. This may be difficult at first to sample and
+I would recommend initialising at these values.  
+
+## Volume in hyperspace don't make much sense
+
+Given an n-dimensional cube of length=2 you place spheres
+of diameter=1 in each of the corners and then place another
+sphere in the middle.
+
+How does the size of the middle sphere change as dimensions increase?
+
+![](img/dimension_sphere_diagram.png)
+
+### Radius of middle sphere as dimension increases
+
+![](img/dimension_plot.png)
