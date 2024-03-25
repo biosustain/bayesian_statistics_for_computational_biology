@@ -185,6 +185,8 @@ pd.DataFrame({
 })
 ```
 
+### Writing the model in Stan and sampling the simulated data
+
 I wrote up the implied statistical model in a Stan file at `src/stan/
 pipette.stan`. This code loads this Stan file as a `CmdStanModel` object, checks
 its formatting and prints it out.
@@ -229,6 +231,8 @@ mcmc_posterior.diagnose()
 The diagnostics seem ok, though interestingly the prior was pretty tricky to
 sample accurately.
 
+### Loading the MCMC results with arviz
+
 This code loads both MCMC runs into an arviz `InferenceData` object.
 
 ```{python}
@@ -268,6 +272,8 @@ for group_name in ["prior", "posterior"]:
     )
     display(group_summary)
 ```
+
+### Investigating the results
 
 This plot compares the measurements with the observations.
 
