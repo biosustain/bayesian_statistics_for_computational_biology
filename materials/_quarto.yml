@@ -3,6 +3,8 @@ bibliography: bibliography.bib
 citestyle: ieee.csl
 reference-location: margin
 toc: true
+filters:
+  - include-code-files
 
 project:
   type: website
@@ -13,6 +15,7 @@ project:
     - week2.md
     - metropolis-hastings.qmd
     - week3.qmd
+    - week5.qmd
 
 website:
   title: "Bayesian Statistics for Computational Biology"
@@ -33,6 +36,7 @@ website:
         - week2.md
         - metropolis-hastings.qmd
         - week3.qmd
+        - week5.qmd
 
 format:
   html:

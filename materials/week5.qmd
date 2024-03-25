@@ -1,0 +1,350 @@
+# Regression models for describing measurements
+
+Maybe you have seen this equation before:
+
+$$
+y = \alpha + X\cdot\beta + \epsilon
+$$
+
+Components:
+
+- $y$: a measurement
+- $\alpha$ and $\beta$ some unknown parameters, the same for every measurement
+- $X$ some predictors
+- $\epsilon$ an unknown number quantifying the difference between the prediction and the observation, different for each measurement
+
+Often $\epsilon$ is assumed to have a normal distribution with location zero and
+scale parameter $\sigma$.
+
+Another way of saying the same thing:
+
+$$
+y \sim N(\alpha + X\cdot\beta, \sigma)
+$$
+
+::: {callout-important}
+
+Regression is a nice way of modelling measurements
+
+:::
+
+$\alpha + X\cdot\beta$ is just one option: there are many ways in which
+measurements and predictors can be related. The normal distribution is also not
+required, in fact it is often inappropriate.
+
+The real key features of a regression model:
+
+- a predictor (doesn't have to be linear)
+- a probabilistic relationship between the predictor and the measurement 
+
+::: {callout-important}
+
+Bayesian modelling lets you give free rein to your creativity when designing
+regressions, so you can make models that represent what you know about the
+measurement process.
+
+:::
+
+Tips for designing regression models:
+
+- think about constraints
+- try log-transforming things
+- start simple
+- aim to explicitly represent how you think the measurement apparatus works
+- heavy tailed distributions are often better than the normal distribution
+
+More about regression: @gelmanRegressionOtherStories
+
+
+## Example
+
+Teddy has never been in the lab and is bad at pipetting. Unfortunately, some
+label needed to be put in some Eppendorf tubes, and noone else was available to
+do it themselves or even supervise.
+
+Each tube had a required volume of label which Teddy tried to hit, but probably
+there was some inaccuracy due to bad eyesight, poor hand control or something.
+
+In addition, there was also probably some consistent bias, as the pipette was
+consistently adding too much or too little liquid. It seemed pretty old.
+
+Luckily, someone was able to measure how much label ended up in 8 out of the 24
+tubes with pretty good accuracy. Now we want to estimate how much label there is
+in the other 16 tubes, taking into account these measurements as well as what we
+know about the likely biased pipette and inconsistent pipetter.
+
+To describe this situation we'll first think of a regression model that
+describes the measurement setup, then use Python to simulate data from the
+model given some plausible parameter values. Next we'll implement the model in Stan, then fit the simulated data using MCMC and then analyse the results.
+
+### Regression model
+
+To model the noise that Teddy introduced by being bad at pipetting and the
+bias introduced by the bad pipette, we need some parameters that connect the
+known target volumes with the unknown true volumes. Let's call them $noise$
+and $bias$. Since the volumes are constrained positive, a distribution that
+automatically excludes negative numbers is probably a good idea: the log-normal
+distribution is usually a good starting point. This equation describes a plausible relationship:
+
+$$
+volume \sim LN(\ln{(target\cdot bias)}, noise)
+$$
+
+To model the helpful measurements, we use another log-normal distribution and  assume the measuring device is unbiased and has known log-scale standard error $cal\ error$:^[NB the scale parameter of a lognormal distribution represents **multiplicative** error]
+
+$$
+measurements \sim LN(\ln{volume}, cal\ error)
+$$
+
+To round off the model we can think about the likely values of the unknown
+parameters $bias$ and $noise$. $bias$ is likely not to be too far away from
+1, otherwise someone would have probably thrown the pipette away already. A
+prior distribution that puts most of its mass between 0.75 and 1.25 therefore
+seems reasonable. Similarly, a prior for $noise$ should probably not imply that
+Teddy's pipetting errors regularly exceeded 30%. This consideration motivates
+a prior for $noise$ that puts most of its mass below 0.15.
+
+### Simulating fake data
+
+First some imports: as usual for this course we'll be using `arviz`,
+`matplotlib`, `cmdstanpy`, `pandas` and `numpy`. `stanio` is a handy utility
+library for Stan: it is a dependency of cmdstanpy so you shouldn't need to
+install it explicitly.
+
+```{python}
+import arviz as az
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import stanio
+
+from cmdstanpy import CmdStanModel
+```
+
+Now some hardcoded numbers, including true values for the parameters here:
+$bias$ is 0.88 and $noise$ is 0.1. Note that $cal\ error$ is much smaller than
+$bias$.
+
+```{python}
+N = 24
+N_CAL = 8
+TARGET_VOLUMES = np.array(
+    [
+      *([200] * 8),
+      *([400] * 8),
+      *([800] * 8),
+    ]
+)
+MEASUREMENT_IX = np.array([1, 4, 9, 11, 15, 19, 21, 22])
+CAL_ERROR = 0.02
+BIAS_FACTOR = 0.88
+NOISE = 0.1
+RNG_SEED = 12345
+```
+
+Simulate the true volumes
+
+```{python}
+rng = np.random.default_rng(seed=RNG_SEED)
+ln_mean = [
+  np.log(target * BIAS_FACTOR)
+  for target in TARGET_VOLUMES
+]
+volumes = rng.lognormal(mean=ln_mean, sigma=NOISE)
+volumes
+```
+
+Plot the volumes and the targets.
+
+```{python}
+f, ax = plt.subplots()
+bins = np.logspace(np.log10(100), np.log10(1000), 30)
+ax.hist(volumes, bins=bins)
+for t in (200, 400, 800):
+    ax.axvline(t, color="red")
+ax.semilogx()
+ax.set_xticks([200, 400, 800], [200, 400, 800]);
+ax.set(
+    xlabel="volume ($\\mu$l)",
+    ylabel="Frequency",
+    title="How much label ended up in the tubes"
+);
+```
+
+Simulate measurements for tubes in the `MEASUREMENT_IX`.
+
+```{python}
+measurements = [
+  rng.lognormal(np.log(vol), CAL_ERROR)
+  for vol in volumes[MEASUREMENT_IX]
+]
+pd.DataFrame({
+  "target volume": np.array(TARGET_VOLUMES)[MEASUREMENT_IX], 
+  "actual volume": volumes[MEASUREMENT_IX],
+  "measured volume": measurements
+})
+```
+
+I wrote up the implied statistical model in a Stan file at `src/stan/
+pipette.stan`. This code loads this Stan file as a `CmdStanModel` object, checks
+its formatting and prints it out.
+
+Note that the model internally puts the data on log scale and then standardises
+it: this is a bit annoying but makes it way easier to set priors and can
+ultimately save you a lot of trouble.
+
+```{python}
+model = CmdStanModel(stan_file="../src/stan/pipette.stan")
+model.format(overwrite_file=True, canonicalize=True)
+print(model.code())
+```
+
+This code loads some data into a dictionary that is compatible with Stan and
+carries out two MCMC runs, one in prior mode and one in posterior mode.
+
+```{python}
+stan_input_posterior = stanio.json.process_dictionary(
+    {
+      "N": N,
+      "N_cal": N_CAL,
+      "target_volume": TARGET_VOLUMES,
+      "y": measurements,
+      "measurement_ix": MEASUREMENT_IX + 1,
+      "cal_error": CAL_ERROR,
+      "likelihood": 1,
+  }
+)
+stan_input_prior = stan_input_posterior | {"likelihood": 0}
+mcmc_prior = model.sample(
+    data=stan_input_prior,
+    adapt_delta=0.999,
+    max_treedepth=12,
+    seed=RNG_SEED,
+)
+mcmc_posterior = model.sample(data=stan_input_posterior, seed=RNG_SEED)
+mcmc_prior.diagnose()
+mcmc_posterior.diagnose()
+```
+
+The diagnostics seem ok, though interestingly the prior was pretty tricky to
+sample accurately.
+
+This code loads both MCMC runs into an arviz `InferenceData` object.
+
+```{python}
+coords = {"obs": MEASUREMENT_IX, "tube": range(N)}
+dims={
+    "y": ["obs"],
+    "y_rep": ["obs"],
+    "target_volume": ["tube"],
+    "true_volume": ["tube"],
+    "volume": ["tube"],
+    "tube": ["tube"]
+}
+idata = az.from_cmdstanpy(
+    posterior=mcmc_posterior,
+    prior=mcmc_prior,
+    log_likelihood="llik",
+    observed_data=stan_input_posterior | {
+        "true_volume": volumes, "tube": range(N)
+    },
+    posterior_predictive={"y": "y_rep"},
+    coords=coords,
+    dims=dims
+)
+idata
+```
+
+Next we look at the summaries of both the posterior and prior.
+
+```{python}
+for group_name in ["prior", "posterior"]:
+    group = idata.get(group_name)
+    group_summary = az.summary(
+        group,
+        var_names=[
+            "volume_noise", "bias_factor", "volume_noise_s", "bias_factor_l"
+        ]
+    )
+    display(group_summary)
+```
+
+This plot compares the measurements with the observations.
+
+```{python}
+az.plot_lm(
+    y=idata.observed_data["y"],
+    x=idata.observed_data["tube"].sel(tube=MEASUREMENT_IX + 1),
+    y_hat=idata.posterior_predictive["y_rep"]
+)
+ax = plt.gca()
+ax.semilogy()
+```
+
+This plot compares the `volume_noise` and `bias_factor` samples with the true
+values that we used to simulate the data.
+
+```{python}
+az.plot_posterior(
+  idata.prior,
+  var_names=["volume_noise", "bias_factor"],
+  kind="hist",
+  hdi_prob="hide",
+  point_estimate=None,
+  figsize=[12, 4]
+)
+f = plt.gcf()
+axes = f.axes
+az.plot_posterior(
+  idata.posterior,
+  var_names=["volume_noise", "bias_factor"],
+  kind="hist",
+  hdi_prob="hide",
+  point_estimate=None,
+  figsize=[12, 4],
+  ax=axes,
+  color="tab:orange"
+)
+for ax, truth in zip(f.axes, [NOISE, BIAS_FACTOR]):
+    ax.axvline(truth, color="red")
+```
+
+This plot shows the samples for all the tubes' volumes, including those that
+weren't measured, alongside the true volumes.
+
+```{python}
+az.plot_lm(
+    x=idata.observed_data["tube"],
+    y=idata.observed_data["true_volume"],
+    y_hat=idata.posterior["volume"],
+    grid=False,
+    y_kwargs={"label": "true volume"},
+    figsize=[10, 5],
+    legend=False,
+)
+ax = plt.gca()
+for i in MEASUREMENT_IX:
+    ax.text(i+0.1, volumes[i], "obs", zorder=1000)
+ax.set(xlabel="tube", ylabel="volume ($\\mu$l)");
+ax.semilogy()
+```
+
+So, what is the probability that Teddy put less than 350 $\mu$l
+of label into tube 10, even though the target amount was 400$\mu$l?
+
+```{python}
+az.plot_posterior(
+  idata.prior,
+  var_names=["volume"],
+  coords={"tube": [10]},
+  kind="hist",
+  hdi_prob="hide",
+  point_estimate=None,
+  ref_val=350,
+  figsize=[12, 4],
+  bins=np.linspace(250, 600, 30),
+)
+
+```
+
+Phew, only about 13%, that's probably fine right?
