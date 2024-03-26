@@ -76,14 +76,14 @@ $$
 
 ### Reading
 
-- A practical guide to regression modelling: @gelmanRegressionOtherStories
+- A practical guide to regression modelling: @gelman2020regression
 
 - The [section of the Stan user's guide on regression models](https://
 mc-stan.org/docs/stan-users-guide/regression.html) is really nice.
 
 - [Modern Statistics for Modern Biology](https://www.huber.embl.de/msmb/)
 is an online (and physical) textbook with some very good material about
-biology-relevant regression models.
+biology-relevant regression models: @susanholmesModernStatisticsModern2019.
 
 ## Example
 
