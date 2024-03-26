@@ -1,6 +1,10 @@
 # Regression models for describing measurements
 
-Maybe you have seen this equation before:
+## What is regression?
+
+Regression is a nice way of modelling measurements.
+
+Maybe you have seen this regression model before:
 
 $$
 y = \alpha + X\cdot\beta + \epsilon
@@ -10,7 +14,7 @@ Components:
 
 - $y$: a measurement
 - $\alpha$ and $\beta$ some unknown parameters, the same for every measurement
-- $X$ some predictors
+- $X$ some real-valued features
 - $\epsilon$ an unknown number quantifying the difference between the prediction and the observation, different for each measurement
 
 Often $\epsilon$ is assumed to have a normal distribution with location zero and
@@ -22,39 +26,64 @@ $$
 y \sim N(\alpha + X\cdot\beta, \sigma)
 $$
 
-::: {callout-important}
+I prefer this notation because it nicely separates the different components,
+and doesn't hide the error parameter $\sigma$. It also makes it clear what
+you might change. For example $\alpha + X\cdot\beta$ is just one option: there
+are many ways in which measurements and predictors can be related. The normal
+distribution is also not required, in fact it is often inappropriate.
 
-Regression is a nice way of modelling measurements
+The key features of a regression model:
 
-:::
-
-$\alpha + X\cdot\beta$ is just one option: there are many ways in which
-measurements and predictors can be related. The normal distribution is also not
-required, in fact it is often inappropriate.
-
-The real key features of a regression model:
-
-- a predictor (doesn't have to be linear)
+- a predictor that is some function of the parameters and features
 - a probabilistic relationship between the predictor and the measurement 
 
-::: {callout-important}
+::: {.callout-important}
 
-Bayesian modelling lets you give free rein to your creativity when designing
-regressions, so you can make models that represent what you know about the
-measurement process.
+In the context of regression modelling, Bayesian inference lets you give free
+rein to your creativity when designing regressions, so you can make models that
+represent what you know about the measurement process.
 
 :::
 
-Tips for designing regression models:
+### Generalised linear models
 
-- think about constraints
-- try log-transforming things
-- start simple
-- aim to explicitly represent how you think the measurement apparatus works
-- heavy tailed distributions are often better than the normal distribution
+This is a popular and powerful class of regression model with the following
+distinguishing characteristics:
 
-More about regression: @gelmanRegressionOtherStories
+- The predictor is a **linear** function of the parameters and features, e.g. $
+\alpha + X\cdot\beta$
 
+- The probability distribution describing measurement errors is **not**
+necessarily the normal distribution, e.g. log-normal, Poisson, Dirichlet, Gamma,
+…
+
+- There is a **link function** that connects the linear predictor with the
+probability distribution, e.g. $\ln(\alpha + X\cdot\beta)$.
+
+An example GLM for positive-constrained measurements:
+
+$$
+y \sim LN(\ln(\alpha+X\cdot\beta), \sigma)
+$$
+
+### Tips for designing regression models
+
+- Start with the simplest GLM that obeys all known data constraints.
+- Try log-transforming things.
+- Aim to explicitly represent how you think the measurement apparatus works.
+- Heavy tailed distributions are often better than the normal distribution.
+- Remember that varying measurement error is an option.
+
+### Reading
+
+- A practical guide to regression modelling: @gelmanRegressionOtherStories
+
+- The [section of the Stan user's guide on regression models](https://
+mc-stan.org/docs/stan-users-guide/regression.html) is really nice.
+
+- [Modern Statistics for Modern Biology](https://www.huber.embl.de/msmb/)
+is an online (and physical) textbook with some very good material about
+biology-relevant regression models.
 
 ## Example
 
