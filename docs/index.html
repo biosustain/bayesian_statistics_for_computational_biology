@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.551">
+<meta name="generator" content="quarto-1.4.553">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -4756,13 +4756,13 @@ MathJax.Hub.Config({
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week1.html" class="sidebar-item-text sidebar-link">
+  <a href="./introduction_to_bayesian_inference.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction to Bayesian inference</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week2.html" class="sidebar-item-text sidebar-link">
+  <a href="./mcmc_and_stan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MCMC and Stan</span></a>
   </div>
 </li>
@@ -4773,15 +4773,18 @@ MathJax.Hub.Config({
   </div>
 </li>
           <li class="sidebar-item">
+ <span class="menu-text">after_mcmc.qmd</span>
+  </li>
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">What to do after MCMC</span></a>
+  <a href="./regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Regression models for describing measurements</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Regression models for describing measurements</span></a>
+  <a href="./hierarchical_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hierarchical models</span></a>
   </div>
 </li>
       </ul>
@@ -4802,13 +4805,14 @@ MathJax.Hub.Config({
   <li><a href="#plan" id="toc-plan" class="nav-link" data-scroll-target="#plan">Plan</a>
   <ul class="collapse">
   <li><a href="#week-1-what-is-bayesian-inference" id="toc-week-1-what-is-bayesian-inference" class="nav-link" data-scroll-target="#week-1-what-is-bayesian-inference">Week 1: What is Bayesian inference?</a></li>
-  <li><a href="#week-2-mcmc" id="toc-week-2-mcmc" class="nav-link" data-scroll-target="#week-2-mcmc">Week 2: MCMC</a></li>
-  <li><a href="#week-3-after-mcmc-diagnostics-and-decisions" id="toc-week-3-after-mcmc-diagnostics-and-decisions" class="nav-link" data-scroll-target="#week-3-after-mcmc-diagnostics-and-decisions">Week 3: After MCMC: diagnostics, and decisions</a></li>
-  <li><a href="#week-4-bayesian-workflow" id="toc-week-4-bayesian-workflow" class="nav-link" data-scroll-target="#week-4-bayesian-workflow">Week 4: Bayesian workflow</a></li>
+  <li><a href="#week-2-mcmc-and-stan" id="toc-week-2-mcmc-and-stan" class="nav-link" data-scroll-target="#week-2-mcmc-and-stan">Week 2: MCMC and Stan</a></li>
+  <li><a href="#week-3-metropolis-hastings" id="toc-week-3-metropolis-hastings" class="nav-link" data-scroll-target="#week-3-metropolis-hastings">Week 3: Metropolis-Hastings</a></li>
+  <li><a href="#week-4-after-mcmc-diagnostics-and-decisions" id="toc-week-4-after-mcmc-diagnostics-and-decisions" class="nav-link" data-scroll-target="#week-4-after-mcmc-diagnostics-and-decisions">Week 4: After MCMC: diagnostics, and decisions</a></li>
   <li><a href="#week-5-regression-models-in-biology" id="toc-week-5-regression-models-in-biology" class="nav-link" data-scroll-target="#week-5-regression-models-in-biology">Week 5: Regression models in biology</a></li>
-  <li><a href="#week-6-odes" id="toc-week-6-odes" class="nav-link" data-scroll-target="#week-6-odes">Week 6: ODEs</a></li>
-  <li><a href="#week-7-case-study-a-large-biological-analysis" id="toc-week-7-case-study-a-large-biological-analysis" class="nav-link" data-scroll-target="#week-7-case-study-a-large-biological-analysis">Week 7: Case study: a large biological analysis</a></li>
-  <li><a href="#week-8-10-project" id="toc-week-8-10-project" class="nav-link" data-scroll-target="#week-8-10-project">Week 8-10: Project</a></li>
+  <li><a href="#week-6-hierarchical-models" id="toc-week-6-hierarchical-models" class="nav-link" data-scroll-target="#week-6-hierarchical-models">Week 6: Hierarchical models</a></li>
+  <li><a href="#week-7-odes" id="toc-week-7-odes" class="nav-link" data-scroll-target="#week-7-odes">Week 7: ODEs</a></li>
+  <li><a href="#week-8-bayesian-workflow" id="toc-week-8-bayesian-workflow" class="nav-link" data-scroll-target="#week-8-bayesian-workflow">Week 8: Bayesian workflow</a></li>
+  <li><a href="#week-9-10-project" id="toc-week-9-10-project" class="nav-link" data-scroll-target="#week-9-10-project">Week 9-10: Project</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -4840,7 +4844,7 @@ MathJax.Hub.Config({
 <section id="plan" class="level2">
 <h2 class="anchored" data-anchor-id="plan">Plan</h2>
 <section id="week-1-what-is-bayesian-inference" class="level3">
-<h3 class="anchored" data-anchor-id="week-1-what-is-bayesian-inference">Week 1: <a href="./week1.html">What is Bayesian inference?</a></h3>
+<h3 class="anchored" data-anchor-id="week-1-what-is-bayesian-inference">Week 1: <a href="./introduction_to_bayesian_inference.html">What is Bayesian inference?</a></h3>
 <section id="theory" class="level4">
 <h4 class="anchored" data-anchor-id="theory">Theory</h4>
 <p>Statistical inference in general</p>
@@ -4860,8 +4864,8 @@ MathJax.Hub.Config({
 <p><span class="citation" data-cites="boxBayesianInferenceStatistical1992">Box and Tiao (<a href="#ref-boxBayesianInferenceStatistical1992" role="doc-biblioref">1992</a>, Ch. 1.1)</span></p>
 </section>
 </section>
-<section id="week-2-mcmc" class="level3">
-<h3 class="anchored" data-anchor-id="week-2-mcmc">Week 2: MCMC</h3>
+<section id="week-2-mcmc-and-stan" class="level3">
+<h3 class="anchored" data-anchor-id="week-2-mcmc-and-stan">Week 2: <a href="./mcmc_and_stan.html">MCMC and Stan</a></h3>
 <section id="theory-1" class="level4">
 <h4 class="anchored" data-anchor-id="theory-1">Theory</h4>
 <p>What is MCMC?</p>
@@ -4877,8 +4881,11 @@ MathJax.Hub.Config({
 <p><span class="citation" data-cites="betancourtConceptualIntroductionHamiltonian2018">Betancourt (<a href="#ref-betancourtConceptualIntroductionHamiltonian2018" role="doc-biblioref">2018</a>)</span></p>
 </section>
 </section>
-<section id="week-3-after-mcmc-diagnostics-and-decisions" class="level3">
-<h3 class="anchored" data-anchor-id="week-3-after-mcmc-diagnostics-and-decisions">Week 3: After MCMC: diagnostics, and decisions</h3>
+<section id="week-3-metropolis-hastings" class="level3">
+<h3 class="anchored" data-anchor-id="week-3-metropolis-hastings">Week 3: <a href="./metropolis-hastings.html">Metropolis-Hastings</a></h3>
+</section>
+<section id="week-4-after-mcmc-diagnostics-and-decisions" class="level3">
+<h3 class="anchored" data-anchor-id="week-4-after-mcmc-diagnostics-and-decisions">Week 4: <a href="after_mcmc.md">After MCMC</a>: diagnostics, and decisions</h3>
 <section id="theory-2" class="level4">
 <h4 class="anchored" data-anchor-id="theory-2">Theory</h4>
 <p>Diagnostics: convergence, divergent transitions, effective sample size</p>
@@ -4895,70 +4902,62 @@ MathJax.Hub.Config({
 <p><span class="citation" data-cites="vehtariPracticalBayesianModel2017">Vehtari, Gelman, and Gabry (<a href="#ref-vehtariPracticalBayesianModel2017" role="doc-biblioref">2017</a>)</span></p>
 </section>
 </section>
-<section id="week-4-bayesian-workflow" class="level3">
-<h3 class="anchored" data-anchor-id="week-4-bayesian-workflow">Week 4: Bayesian workflow</h3>
-<section id="theory-3" class="level4">
-<h4 class="anchored" data-anchor-id="theory-3">Theory</h4>
-<p>Parts of a statistical anlaysis (not just inference!)</p>
-<p>Why Bayesian workflow is complex: non-linearity and plurality</p>
-<p>Writing scalable statistical programming projects</p>
-</section>
-<section id="practice-3" class="level4">
-<h4 class="anchored" data-anchor-id="practice-3">Practice</h4>
-<p>Write a scalable statistical analysis with <a href="https://docs.readthedocs.io/en/stable/config-file/v2.html">bibat</a>.</p>
-</section>
-<section id="reading-3" class="level4">
-<h4 class="anchored" data-anchor-id="reading-3">Reading</h4>
-<p><span class="citation" data-cites="gelmanBayesianWorkflow2020">Gelman et al. (<a href="#ref-gelmanBayesianWorkflow2020" role="doc-biblioref">2020</a>)</span></p>
-</section>
-</section>
 <section id="week-5-regression-models-in-biology" class="level3">
 <h3 class="anchored" data-anchor-id="week-5-regression-models-in-biology">Week 5: Regression models in biology</h3>
-<section id="theory-4" class="level4">
-<h4 class="anchored" data-anchor-id="theory-4">Theory</h4>
+<section id="theory-3" class="level4">
+<h4 class="anchored" data-anchor-id="theory-3">Theory</h4>
 <p>Generalised linear models</p>
 <p>Prior elicitation</p>
 <p>Hierarchical models</p>
 </section>
-<section id="practice-4" class="level4">
-<h4 class="anchored" data-anchor-id="practice-4">Practice</h4>
+<section id="practice-3" class="level4">
+<h4 class="anchored" data-anchor-id="practice-3">Practice</h4>
 <p>Compare some statistical models of a simulated biological dataset</p>
 </section>
-<section id="reading-4" class="level4">
-<h4 class="anchored" data-anchor-id="reading-4">Reading</h4>
+<section id="reading-3" class="level4">
+<h4 class="anchored" data-anchor-id="reading-3">Reading</h4>
 <p><span class="citation" data-cites="HierarchicalModeling">Betancourt (<a href="#ref-HierarchicalModeling" role="doc-biblioref">2024</a>)</span></p>
 </section>
 </section>
-<section id="week-6-odes" class="level3">
-<h3 class="anchored" data-anchor-id="week-6-odes">Week 6: ODEs</h3>
-<section id="theory-5" class="level4">
-<h4 class="anchored" data-anchor-id="theory-5">Theory</h4>
+<section id="week-6-hierarchical-models" class="level3">
+<h3 class="anchored" data-anchor-id="week-6-hierarchical-models">Week 6: Hierarchical models</h3>
+</section>
+<section id="week-7-odes" class="level3">
+<h3 class="anchored" data-anchor-id="week-7-odes">Week 7: ODEs</h3>
+<section id="theory-4" class="level4">
+<h4 class="anchored" data-anchor-id="theory-4">Theory</h4>
 <p>What is an ODE?</p>
 <p>ODE solvers</p>
 <p>ODE solvers inside probabilistic programs</p>
 </section>
-<section id="practice-5" class="level4">
-<h4 class="anchored" data-anchor-id="practice-5">Practice</h4>
+<section id="practice-4" class="level4">
+<h4 class="anchored" data-anchor-id="practice-4">Practice</h4>
 <p>Fit a model with an ODE.</p>
 </section>
-<section id="reading-5" class="level4">
-<h4 class="anchored" data-anchor-id="reading-5">Reading</h4>
+<section id="reading-4" class="level4">
+<h4 class="anchored" data-anchor-id="reading-4">Reading</h4>
 <p><span class="citation" data-cites="timonenImportanceSamplingApproach2022">Timonen et al. (<a href="#ref-timonenImportanceSamplingApproach2022" role="doc-biblioref">2022</a>)</span></p>
 </section>
 </section>
-<section id="week-7-case-study-a-large-biological-analysis" class="level3">
-<h3 class="anchored" data-anchor-id="week-7-case-study-a-large-biological-analysis">Week 7: Case study: a large biological analysis</h3>
-<section id="theory-6" class="level4">
-<h4 class="anchored" data-anchor-id="theory-6">Theory</h4>
-<p>Close reading of a biological analysis with multiple datasets and models, ODEs, a hierarchical component and non-standard measurements.</p>
+<section id="week-8-bayesian-workflow" class="level3">
+<h3 class="anchored" data-anchor-id="week-8-bayesian-workflow">Week 8: Bayesian workflow</h3>
+<section id="theory-5" class="level4">
+<h4 class="anchored" data-anchor-id="theory-5">Theory</h4>
+<p>Parts of a statistical anlaysis (not just inference!)</p>
+<p>Why Bayesian workflow is complex: non-linearity and plurality</p>
+<p>Writing scalable statistical programming projects</p>
 </section>
-<section id="practice-6" class="level4">
-<h4 class="anchored" data-anchor-id="practice-6">Practice</h4>
-<p>Project brainstorm</p>
+<section id="practice-5" class="level4">
+<h4 class="anchored" data-anchor-id="practice-5">Practice</h4>
+<p>Write a scalable statistical analysis with <a href="https://docs.readthedocs.io/en/stable/config-file/v2.html">bibat</a>.</p>
+</section>
+<section id="reading-5" class="level4">
+<h4 class="anchored" data-anchor-id="reading-5">Reading</h4>
+<p><span class="citation" data-cites="gelmanBayesianWorkflow2020">Gelman et al. (<a href="#ref-gelmanBayesianWorkflow2020" role="doc-biblioref">2020</a>)</span></p>
 </section>
 </section>
-<section id="week-8-10-project" class="level3">
-<h3 class="anchored" data-anchor-id="week-8-10-project">Week 8-10: Project</h3>
+<section id="week-9-10-project" class="level3">
+<h3 class="anchored" data-anchor-id="week-9-10-project">Week 9-10: Project</h3>
 <p>Format: one hour joint feedback and help session</p>
 
 
