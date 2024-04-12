@@ -4,3 +4,7 @@ docs/_book
 docs/.quarto
 .DS_Store
 .pdm-python
+
+src/stan/pipette
+src/stan/plushies
+src/stan/plushies-nc
