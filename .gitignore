@@ -1,3 +1,4 @@
+*.ipynb_checkpoints*
 *_extensions*
 docs/_book
 docs/.quarto
