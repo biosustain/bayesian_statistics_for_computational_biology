@@ -11,11 +11,12 @@ project:
   output-dir: "../docs"
   render:
     - index.md
-    - week1.md
-    - week2.md
+    - introduction_to_bayesian_inference.md
+    - mcmc_and_stan.md
     - metropolis-hastings.qmd
-    - week3.qmd
-    - week5.qmd
+    - after_mcmc.qmd
+    - regression.qmd
+    - hierarchical_models.qmd
 
 website:
   title: "Bayesian Statistics for Computational Biology"
@@ -32,11 +33,12 @@ website:
         - index.md
       - section: "Course materials"
         contents:
-        - week1.md
-        - week2.md
+        - introduction_to_bayesian_inference.md
+        - mcmc_and_stan.md
         - metropolis-hastings.qmd
-        - week3.qmd
-        - week5.qmd
+        - after_mcmc.qmd
+        - regression.qmd
+        - hierarchical_models.qmd
 
 format:
   html:
@@ -44,9 +46,3 @@ format:
     embed-resources: true
     include-in-header: mathjax.html
   ipynb: default
-  # revealjs:
-  #   embed-resources: true
-  #   include-in-header: mathjax.html
-  #   slide-level: 4
-  #   smaller: true
-  #   scrollable: true

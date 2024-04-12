@@ -11,7 +11,7 @@ Plan for today:
 
 Recap from last week:
 
-**[What is MCMC trying to solve](week2.md#MCMC)**: MCMC
+**[What is MCMC trying to solve](mcmc_and_stan.md#MCMC)**: MCMC
 
 ## MCMC
 

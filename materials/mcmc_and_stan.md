@@ -8,16 +8,6 @@ Plan for today:
 1. [MCMC](#mcmc)
 2. [Getting started with Stan in Python](#getting-started-with-stan-in-python)
 
-Recap from last week:
-
-**[Bayesian inference](week1.md#what-is-bayesian-statistical-inference)**: Statistical inference resulting in probabilities
-
-**[Why in general?](week1.md#why-is-bayesian-statistical-inference-useful)** Probability is expressive, old and decomposes nicely
-
-**[Why in biology?](/week1.md#reasons-specific-to-computational-biology)** Hierarchical regression models with ODEs
-
-**[The big challenge](week1.md#the-big-challenge)** Integrating high dimensional probability functions
-
 ## MCMC
 
 ### The big picture

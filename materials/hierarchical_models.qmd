@@ -1,0 +1,339 @@
+# Hierarchical models
+
+In general: a model with hyperparameters, i.e. parameters that describe other
+parameters.
+
+Hierarchical models are great for describing the situation where you know some
+measurements have something in common, but you don't know how much.
+
+## Example: always be closing!
+
+Plushycorp employs 10 salespeople who go door to door selling cute plushies. The
+number of plushies that each salesperson sold every working day for two weeks
+was recorded. What can Plushycorp find out from this data?
+
+To answer the question in a best-case scenario, we can use a hierarchical
+model to run a "digital twin" of this experiment with known parameters and
+data generating process. Specifically, we can assume that the number $y_{ij}$
+of plushies that salesperson $i$ sells on day $j$ depends on a combination of
+factors:
+
+- The baseline amount $\mu$ that a totally average salesperson would sell on a
+normal day
+- The salesperson's ability $ability_i$
+- An effect $day\ effect_j$ for the day of the week: people are thought to buy
+fewer and fewer plushies as the week drags on.
+- Some random variation
+
+A good first step for modelling count data is the Poisson distribution,
+so let's assume that the sales measurements follow the following Poisson
+distribution:^[Note the use of the log link function.]
+
+\begin{align*}
+y_{ij} &\sim Poisson(\lambda) \\
+\ln\lambda &= \mu + ability_i + day\ effect_j
+\end{align*}
+
+We know that the salespeople have different abilities, but how just different
+are they? Since this isn't really clear to Plushycorp, it makes sense to
+introduce a parameter $\tau_{ability}$ into the model:
+
+\begin{equation*}
+ability \sim N(0, \tau^{ability})
+\end{equation*}
+
+Now we have a hierarchical model!
+
+We can make a similar argument for the day of the week effects:^[Can you think of a better model for day effects given the information above??]
+
+\begin{equation*}
+day\ effect \sim N(0, \tau^{day})
+\end{equation*}
+
+Finally we can complete our model by specifying prior distributions for
+the non-hierarchical parameters:^[$HN$ here refers to the "half-normal"
+distribution, a decent default prior for hierarchical standard deviations]
+
+\begin{align*}
+\mu &\sim LN(0, 1) \\
+\tau_ability &\sim HN(0, 1) \\
+\tau_day &\sim HN(0, 1)
+\end{align*}
+
+To test out our model with fake data, we can use Python to generate a fake set
+of salespeople and days, then generate some sales consistently with our model.
+Next we can generate some data,
+
+```{python}
+from pathlib import Path
+import json
+import numpy as np
+import pandas as pd
+
+N_SALESPERSON = 10
+N_WEEK = 2
+DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+BASELINE = 2  # 2 plushies in one day is fine
+TAU_ABILITY = 0.35
+TAU_DAY = 0.2
+
+SEED = 12345
+DATA_DIR = Path("../data")
+
+rng = np.random.default_rng(seed=SEED)
+
+with open(DATA_DIR / "names.json", "r") as f:
+    name_directory = json.load(f)
+
+names = [
+    f"{first_name} {surname}"
+    for first_name, surname in zip(
+        *map(
+            lambda l: rng.choice(l, size=N_SALESPERSON, replace=False),
+            name_directory.values()
+        )
+    )
+]
+
+abilities = rng.normal(loc=0, scale=TAU_ABILITY, size=N_SALESPERSON)
+
+salespeople = pd.DataFrame({"salesperson": names, "ability": abilities})
+
+salespeople
+```
+
+```{python}
+day_effects = sorted(
+    rng.normal(loc=0, scale=TAU_DAY, size=len(DAY_NAMES))
+)[::-1]  # This (i.e. `[::-1]`) is a nice way to reverse a list
+days = pd.DataFrame({"day": DAY_NAMES, "day_effect": day_effects})
+days
+```
+
+```{python}
+sales = (
+    days
+    .merge(salespeople, how="cross")
+    .merge(pd.DataFrame({"week":[1, 2, 3, 4]}), how="cross")
+    .assign(
+        sales=lambda df: rng.poisson(
+            np.exp(np.log(BASELINE) + df["ability"] + df["day_effect"])
+        )
+    )
+    [["week", "day", "salesperson", "day_effect", "ability", "sales"]]
+    .copy()
+)
+sales.head()
+```
+
+Here is the fortnightly sales chart
+
+```{python}
+total_sales = (
+    sales.groupby("salesperson")["sales"].sum().sort_values(ascending=False)
+)
+
+total_sales.plot(kind="bar", ylabel="Plushies sold", title="Fortnightly sales")
+
+```
+
+It's pretty straightforward to represent hierarchical models with Stan, almost
+like Stan was designed for it!
+
+```{python}
+from cmdstanpy import CmdStanModel
+
+model = CmdStanModel(stan_file="../src/stan/plushies.stan")
+print(model.code())
+```
+
+```{python}
+import arviz as az
+from stanio.json import process_dictionary
+
+def one_encode(l):
+    """One-encode a 1d list-like thing."""
+    return dict(zip(l, range(1, len(l) + 1)))
+
+
+salesperson_codes = one_encode(salespeople["salesperson"])
+day_codes = one_encode(days["day"])
+data_prior = process_dictionary({
+        "N": len(sales),
+        "N_salesperson": len(salespeople),
+        "N_day": len(days),
+        "salesperson": sales["salesperson"].map(salesperson_codes),
+        "day": sales["day"].map(day_codes),
+        "sales": sales["sales"],
+        "likelihood": 0
+    }
+)
+data_posterior = data_prior | {"likelihood": 1}
+mcmc_prior = model.sample(data=data_prior)
+mcmc_posterior = model.sample(data=data_posterior)
+idata = az.from_cmdstanpy(
+    posterior=mcmc_posterior,
+    prior=mcmc_prior,
+    log_likelihood="llik",
+    posterior_predictive="yrep",
+    observed_data=data_posterior,
+    coords={
+        "salesperson": salespeople["salesperson"],
+        "day": days["day"],
+        "observation": sales.index
+    },
+    dims={
+        "lambda": ["observation"],
+        "ability": ["salesperson"],
+        "day_effect": ["day"],
+        "llik": ["observation"],
+        "yrep": ["observation"]
+    }
+)
+idata
+```
+
+```{python}
+az.summary(idata, var_names="~lambda", filter_vars="regex")
+
+```
+
+## The problem with hierarchical models: funnels
+
+Did you notice that cmdstanpy printed some divergent transition warnings above?
+This illustrates a pervasive problem with hierarchical models: funnel-shaped
+marginal posterior distributions. The plot below shows the values of the
+parameter $\tau_{day}$ and the corresponding day effect values for Monday in the
+prior samples:
+
+
+```{python}
+az.plot_pair(
+    idata.prior,
+    var_names=["tau_day", "day_effect"],
+    coords={"day": ["Mon"]},
+);
+```
+
+As we discussed previously, funnels are hard to sample because of their
+inconsistent characteristic lengths. Unfortunately, they are often inevitable in
+hierarchical models. Do you get an idea why from the graph?
+
+There are three main solutions to funnels: add more information, tune the HMC
+algorithm or reparameterise the model.
+
+### Add more information
+
+The posterior distribution didn't have any divergent transitions. This is
+probably because the extra information in the measurements made it easier to
+sample. Comparing the marginal distributions from above illustrates how this can
+happen: note that the difference in scale between the neck and the bowl of the
+funnel is less extreme for the posterior samples.
+
+```{python}
+from matplotlib import pyplot as plt
+f, ax = plt.subplots()
+az.plot_pair(
+    idata.prior,
+    var_names=["tau_day", "day_effect"],
+    coords={"day": ["Mon"]},
+    ax=ax,
+    scatter_kwargs={"label": "prior"},
+);
+az.plot_pair(
+    idata.posterior,
+    var_names=["tau_day", "day_effect"],
+    coords={"day": ["Mon"]},
+    ax=ax,
+    scatter_kwargs={"label": "posterior"},
+);
+ax.legend(frameon=False);
+```
+
+If better measurements aren't available, divergences can often be avoided by
+searching for extra information that can justify narrower priors.
+
+
+### Tune the algorithm
+
+Stan allows increasing the length of the warmup phase (`iter_warmup`, default
+2000), bringing the target acceptance probability close to 1 (`adapt_delta`,
+default 0.8) and by increasing the leapfrog integrator's maximum tree depth (`max_treedepth`, default 10). All of these changes trade speed for reliability.
+
+```{python}
+mcmc_prior_2 = model.sample(
+    data=data_prior,
+    iter_warmup=3000,
+    adapt_delta=0.99,
+    max_treedepth=12
+)
+```
+
+Unfortunately even quite aggressive tuning doesn't get rid of all the divergent
+transitions in this case.
+
+### Reparameterise
+
+The idea with reparameterisation is to define auxiliary parameters which don't
+have problematic relationships, then recover the problematic parameters later.
+
+"Non-centred" parameterisations take a distribution with the form $\alpha\sim
+D(\mu,\sigma)$ and express it as follows:
+
+\begin{align*}
+u \sim D(0, 1)\\
+\alpha = \mu + u * \sigma
+\end{align*}
+
+```{python}
+model_nc = CmdStanModel(stan_file="../src/stan/plushies-nc.stan")
+print(model_nc.code())
+```
+
+```{python}
+mcmc_prior_nc = model.sample(
+    data=data_prior,
+    iter_warmup=3000,
+    adapt_delta=0.999,
+    max_treedepth=12
+)
+```
+
+Beware of using non-centred parameterisation as a default: it isn't
+guaranteed to be better.
+
+## So how many plushies do I need to sell?
+
+```{python}
+f, ax = plt.subplots()
+az.plot_forest(
+    np.exp(idata.posterior["log_mu"] + idata.posterior["ability"]),
+    kind="forestplot",
+    combined=True,
+    ax=ax,
+    show=False,
+);
+ax.scatter(
+    np.exp(np.log(BASELINE) + salespeople["ability"]), 
+    ax.get_yticks()[::-1], 
+    color="red", 
+    label="True expected sales",
+    zorder=2
+)
+ax.scatter(
+    sales.groupby("salesperson")["sales"].mean().reindex(salespeople["salesperson"]), 
+    ax.get_yticks()[::-1], 
+    color="black", 
+    label="Observed sales per day",
+    zorder=3
+)
+ax.set(title="", xlabel="Number of plushies sold per day")
+ax.axvline(BASELINE, linestyle="--", label="baseline", linewidth=0.8, color="black")
+ax.legend(frameon=False);
+```
+
+## Takeaways
+
+- Hierarchical models are a powerful way to capture structural information
+- You may run into problematic sampling, but you have options!
+- There is surprisingly little information in low-expected-value count data.

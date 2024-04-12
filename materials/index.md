@@ -27,7 +27,7 @@ reading material
 
 ## Plan
 
-### Week 1: [What is Bayesian inference?](week1.md) 
+### Week 1: [What is Bayesian inference?](introduction_to_bayesian_inference.md) 
 
 #### Theory 
 
@@ -54,7 +54,7 @@ Install Stan and cmdstanpy
 @boxBayesianInferenceStatistical1992 [Ch. 1.1]
 
  
-### Week 2: MCMC 
+### Week 2: [MCMC and Stan](mcmc_and_stan.md)
 
 #### Theory 
 
@@ -72,8 +72,9 @@ Run an MCMC algorithm and inspect the results
 
 @betancourtConceptualIntroductionHamiltonian2018
 
+### Week 3: [Metropolis-Hastings](metropolis-hastings.qmd)
  
-### Week 3: After MCMC: diagnostics, and decisions  
+### Week 4: [After MCMC](after_mcmc.md): diagnostics, and decisions  
 
 #### Theory 
 
@@ -93,25 +94,6 @@ Diagnose some good and bad MCMC runs
 
 @vehtariPracticalBayesianModel2017
 
- 
-### Week 4: Bayesian workflow 
-
-#### Theory 
-
-Parts of a statistical anlaysis (not just inference!) 
-
-Why Bayesian workflow is complex: non-linearity and plurality 
-
-Writing scalable statistical programming projects 
-
-#### Practice 
-
-Write a scalable statistical analysis with [bibat](https://docs.readthedocs.io/en/stable/config-file/v2.html ).
-
-#### Reading 
-
-@gelmanBayesianWorkflow2020 
-
 ### Week 5: Regression models in biology 
 
 #### Theory 
@@ -130,7 +112,10 @@ Compare some statistical models of a simulated biological dataset
 
 @HierarchicalModeling 
 
-### Week 6: ODEs 
+### Week 6: Hierarchical models 
+
+
+### Week 7: ODEs 
 
 #### Theory 
 
@@ -139,7 +124,7 @@ What is an ODE?
 ODE solvers 
 
 ODE solvers inside probabilistic programs 
-
+ 
 #### Practice
 
 Fit a model with an ODE.
@@ -148,18 +133,26 @@ Fit a model with an ODE.
 
 @timonenImportanceSamplingApproach2022
 
-### Week 7: Case study: a large biological analysis 
+### Week 8: Bayesian workflow 
 
 #### Theory 
 
-Close reading of a biological analysis with multiple datasets and models, ODEs,
-a hierarchical component and non-standard measurements.
+Parts of a statistical anlaysis (not just inference!) 
+
+Why Bayesian workflow is complex: non-linearity and plurality 
+
+Writing scalable statistical programming projects 
 
 #### Practice 
 
-Project brainstorm 
+Write a scalable statistical analysis with [bibat](https://docs.readthedocs.io/en/stable/config-file/v2.html ).
 
-### Week 8-10: Project 
+#### Reading 
+
+@gelmanBayesianWorkflow2020 
+
+
+### Week 9-10: Project 
 
 Format: one hour joint feedback and help session 
 
