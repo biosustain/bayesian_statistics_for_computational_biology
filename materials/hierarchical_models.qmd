@@ -1,10 +1,24 @@
 # Hierarchical models
 
-In general: a model with hyperparameters, i.e. parameters that describe other
-parameters.
+## Theory: what is a hierarchical model?
+
+In general: a model with hyperparameters, i.e. parameters that probabilistically
+control other parameters.
+
+E.g.
+
+\begin{align*}
+y_i &\sim N(\alpha_{group(i)} + \beta \cdot x_i, \sigma) \\
+\alpha{group(i)} &\sim N(\mu, \tau)
+\end{align*}
+
+In this model $\tau$ is a hyperparameter. Is $\mu$ a hyperparameter???
 
 Hierarchical models are great for describing the situation where you know some
-measurements have something in common, but you don't know how much.
+measurements have something in common (e.g. they come from the same group), but
+you don't know how much.
+
+[Learn more!](https://betanalpha.github.io/assets/case_studies/hierarchical_modeling.html)
 
 ## Example: always be closing!
 
