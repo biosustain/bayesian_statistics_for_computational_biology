@@ -1,0 +1,500 @@
+# Nested numerical solving problems
+
+Scientific knowledge often takes the form of specific relationships expressed by systems of equations. For example:
+
+- A system of ordinary differential equations connects some state variables $x$ with some other variables $v$ with equations with the form $\frac{dx}{dt}= f(x, v)$. 
+- An algebraic equation systems says that some variables $v$ are related so that $f(v) = 0$ 
+- A differential algebraic equation system says that some state variables' rates of change have the form $\frac{dx}{dt}= f(x, v)$ and that they satisfy some algebraic constraints $f(x,v)=0$.
+
+If there is an analytic solution to the equation system, we can just include the solution in our statistical model like any other form of structural knowledge: easy! However, often we want to solve equations that are hard or impossible to solve analytically, but can be solved approximately using numerical methods.
+
+This is tricky in the context of Hamiltonian Monte Carlo for two reasons:
+
+1. Computation: HMC requires many evaluations of the log probability density function and its gradients. 
+
+:::{.callout-important}
+At every evaluation, the sampler needs to solve the embedded equation system and find the gradients of the solution with respect to all model parameters.
+:::
+
+2. Extra source of error: how good of an approximation is good enough?
+
+Reading:
+
+- @timonenImportanceSamplingApproach2022
+- Stan user guide sections: [algebraic equation systems](https://mc-stan.org/docs/stan-users-guide/algebraic-equations.html), [ODE systems](https://mc-stan.org/docs/stan-users-guide/odes.html), [DAE systems](https://mc-stan.org/docs/stan-users-guide/dae.html).
+
+## Example
+We have some tubes containing a substrate $S$ and some biomass $C$ that we think
+approximately follow the Monod equation for microbial growth:
+
+\begin{align*}
+\frac{dC}{dt} &= \frac{\mu_{max}\cdot S(t)}{K_{S} + S(t)}\cdot C(t) \\
+\frac{dS}{dt} &= -\gamma \cdot \frac{\mu_{max}\cdot S(t)}{K_{s} + S(t)} \cdot C(t)
+\end{align*}
+
+We measured $C$ and $S$ at different timepoints in some experiments and we want
+to try and find out $\mu_{max}$, $K_{S}$ and $\gamma$ for the different strains
+in the tubes.
+
+You can read more about the Monod equation in @allenBacterialGrowthStatistical2019.
+
+### What we know
+
+$\mu_{max}, K_S, \gamma, S, C$ are non-negative.
+
+$S(0)$ and $C(0)$ vary a little by tube.
+
+$\mu_{max}, K_S, \gamma$ vary by strain.
+
+Measurement noise is roughly proportional to measured quantity.
+
+### Statistical model
+
+We use two regression models to describe the measurements:
+
+\begin{align*}
+y_C &\sim LN(\ln{\hat{C}}, \sigma_{C})  \\
+y_S &\sim LN(\ln{\hat{S}}, \sigma_{S})
+\end{align*}
+
+
+To capture the variation in parameters by tube and strain we add a hierarchical
+regression model:
+
+\begin{align*}
+\ln{\mu_{max}} &\sim N(a_{\mu_{max}}, \tau_{\mu_max}) \\
+\ln{\gamma} &\sim N(a_{gamma}, \tau_{\gamma}) \\
+\ln{\mu_{K_S}} &\sim N(a_{K_S}, \tau_{K_S})
+\end{align*}
+
+To get a true abundance given some parameters we put an ode in the model:
+
+$$
+\hat{C}(t), \hat{S}(t) = \text{solve-monod-equation}(t, C_0, S_0, \mu_max, \gamma, K_S)
+$$
+
+### imports
+
+```{python}
+import itertools
+
+import arviz as az
+import cmdstanpy
+import pandas as pd
+import numpy as np
+
+from matplotlib import pyplot as plt
+```
+
+### Specify true parameters
+
+In order to avoid doing too much annoying handling of strings we assume that all
+the parts of the problem have meaningful 1-indexed integer labels: for example,
+species 1 is biomass.
+
+This code specifies the dimensions of our problem.
+
+```{python}
+N_strain = 4
+N_tube = 16
+N_timepoint = 20
+duration = 15
+strains = [i+1 for i in range(N_strain)]
+tubes = [i+1 for i in range(N_tube)]
+species = [1, 2]
+measurement_timepoint_ixs = [4, 7, 12, 15, 17]
+timepoints = pd.Series(
+    np.linspace(0.01, duration, N_timepoint),
+    name="time",
+    index=range(1, N_timepoint+1)
+)
+SEED = 12345
+rng = np.random.default_rng(seed=SEED)
+```
+
+This code defines some true values for the parameters - we will use these to
+generate fake data.
+
+```{python}
+true_param_values = {
+    "a_mu_max": -1.7,
+    "a_ks": -1.3,
+    "a_gamma": -0.6,
+    "t_mu_max": 0.2,
+    "t_ks": 0.3,
+    "t_gamma": 0.13,
+    "species_zero": [
+        [np.exp(np.random.normal(-2.1, 0.1)), np.exp(np.random.normal(0.2, 0.1))]
+        for _ in range(N_tube)
+    ],
+    "sigma_y": [0.08, 0.1],
+    "ln_mu_max_z": np.random.normal(0, 1, size=N_strain).tolist(),
+    "ln_ks_z": np.random.normal(0, 1, size=N_strain).tolist(),
+    "ln_gamma_z": np.random.normal(0, 1, size=N_strain).tolist(),
+}
+for var in ["mu_max", "ks", "gamma"]:
+    true_param_values[var] = np.exp(
+        true_param_values[f"a_{var}"]
+        + true_param_values[f"t_{var}"] * np.array(true_param_values[f"ln_{var}_z"])
+    ).tolist()
+```
+
+
+### A bit of data transformation
+
+This code does some handy transformations on the data using pandas, giving us a
+table of information about the measurements.
+
+```{python}
+tube_to_strain = pd.Series(
+    [
+        (i % N_strain) + 1 for i in range(N_tube)  # % operator finds remainder
+    ], index=tubes, name="strain"
+)
+measurements = (
+    pd.DataFrame(
+        itertools.product(tubes, measurement_timepoint_ixs, species),
+        columns=["tube", "timepoint", "species"],
+        index=range(1, len(tubes) * len(measurement_timepoint_ixs) * len(species) + 1)
+    )
+    .join(tube_to_strain, on="tube")
+    .join(timepoints, on="timepoint")
+)
+```
+
+### Generating a Stan input dictionary
+
+This code puts the data in the correct format for cmdstanpy.
+
+```{python}
+stan_input_structure = {
+    "N_measurement": len(measurements),
+    "N_timepoint": N_timepoint,
+    "N_tube": N_tube,
+    "N_strain": N_strain,
+    "tube": measurements["tube"].values.tolist(),
+    "measurement_timepoint": measurements["timepoint"].values.tolist(),
+    "measured_species": measurements["species"].values.tolist(),
+    "strain": tube_to_strain.values.tolist(),
+    "timepoint_time": timepoints.values.tolist(),
+}
+```
+This code defines some prior distributions for the model's parameters
+
+```{python}
+priors = {
+    # parameters that can be negative:
+    "prior_a_mu_max": [-1.8, 0.2],
+    "prior_a_ks": [-1.3, 0.1],
+    "prior_a_gamma": [-0.5, 0.1],
+    # parameters that are non-negative:
+    "prior_t_mu_max": [-1.4, 0.1],
+    "prior_t_ks": [-1.2, 0.1],
+    "prior_t_gamma": [-2, 0.1],
+    "prior_species_zero": [[[-2.1, 0.1], [0.2, 0.1]]] * N_tube,
+    "prior_sigma_y": [[-2.3, 0.15], [-2.3, 0.15]],
+}
+```
+
+The next bit of code lets us configure Stan's interface to the Sundials ODE
+solver.
+
+```{python}
+ode_solver_configuration = {
+    "abs_tol": 1e-7,
+    "rel_tol": 1e-7,
+    "max_num_steps": int(1e7)
+}
+```
+
+Now we can put all the inputs together 
+
+```{python}
+stan_input_common = stan_input_structure | priors | ode_solver_configuration
+```
+
+### Load the model
+This code loads the Stan program at `monod.stan` as a `CmdStanModel` object and
+compiles it using cmdstan's compiler.
+
+```{python}
+model = cmdstanpy.CmdStanModel(stan_file="../src/stan/monod.stan")
+print(model.code())
+```
+
+### Sample in fixed param mode to generate fake data
+
+```{python}
+stan_input_true = stan_input_common | {
+    "y": np.ones(len(measurements)).tolist(),  # dummy values as we don't need measurements yet
+    "likelihood": 0                            # we don't need to evaluate the likelihood
+}
+coords = {
+    "strain": strains,
+    "tube": tubes,
+    "species": species,
+    "timepoint": timepoints.index.values,
+    "measurement": measurements.index.values
+}
+dims = {
+    "abundance": ["tube", "timepoint", "species"],
+    "mu_max": ["strain"],
+    "ks": ["strain"],
+    "gamma": ["strain"],
+    "species_zero": ["tube", "species"],
+    "y": ["measurement"],
+    "yrep": ["measurement"],
+    "llik": ["measurement"]
+}
+
+mcmc_true = model.sample(
+    data=stan_input_true,
+    iter_sampling=1,
+    fixed_param=True,
+    chains=1,
+    refresh=1,
+    inits=true_param_values,
+    seed=SEED,
+)
+idata_true = az.from_cmdstanpy(
+    mcmc_true,
+    dims=dims,
+    coords=coords,
+    posterior_predictive={"y": "yrep"},
+    log_likelihood="llik"
+)
+```
+
+### Look at results
+
+```{python}
+def plot_sim(true_abundance, fake_measurements, species_to_ax):
+    f, axes = plt.subplots(1, 2, figsize=[9, 3])
+
+    axes[species_to_ax[1]].set_title("Species 1")
+    axes[species_to_ax[2]].set_title("Species 2")
+    for ax in axes:
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Abundance")
+        for (tube_i, species_i), df_i in true_abundance.groupby(["tube", "species"]):
+            ax = axes[species_to_ax[species_i]]
+            fm = df_i.merge(
+                fake_measurements.drop("time", axis=1),
+                on=["tube", "species", "timepoint"]
+            )
+            ax.plot(
+                df_i.set_index("time")["abundance"], color="black", linewidth=0.5
+            )
+            ax.scatter(
+                fm["time"],
+                fm["simulated_measurement"],
+                color="r",
+                marker="x",
+                label="simulated measurement"
+            )
+    return f, axes
+
+species_to_ax = {1: 0, 2: 1}
+true_abundance = (
+    idata_true.posterior["abundance"]
+    .to_dataframe()
+    .droplevel(["chain", "draw"])
+    .join(timepoints, on="timepoint")
+    .reset_index()
+)
+fake_measurements = measurements.join(
+    idata_true.posterior_predictive["yrep"]
+    .to_series()
+    .droplevel(["chain", "draw"])
+    .rename("simulated_measurement")
+).copy()
+f, axes = plot_sim(true_abundance, fake_measurements, species_to_ax)
+
+f.savefig("img/monod_simulated_data.png")
+```
+
+### Sample in prior mode
+
+```{python}
+
+stan_input_prior = stan_input_common | {
+    "y": fake_measurements["simulated_measurement"],
+    "likelihood": 0
+}
+mcmc_prior = model.sample(
+    data=stan_input_prior,
+    iter_warmup=100,
+    iter_sampling=100,
+    chains=1,
+    refresh=1,
+    save_warmup=True,
+    inits=true_param_values,
+    seed=SEED,
+)
+idata_prior = az.from_cmdstanpy(
+    mcmc_prior,
+    dims=dims,
+    coords=coords,
+    posterior_predictive={"y": "yrep"},
+    log_likelihood="llik"
+)
+idata_prior
+```
+
+We can find the prior intervals for the true abundance and plot them in the graph.
+
+```{python}
+prior_abundances = (
+    idata_prior
+    .posterior["abundance"]
+    .to_dataframe()
+    .reset_index()
+    .join(timepoints, on="timepoint")
+)
+n_sample = 20
+chains_and_draws = rng.choice(prior_abundances[["chain", "draw"]].values, 10)
+f, axes = plot_sim(true_abundance, fake_measurements, species_to_ax)
+for tube_i in tubes:
+    for species_j in species:
+        abundance_sample = (
+            prior_abundances.loc[
+                lambda df: (df["tube"] == tube_i) & (df["species"] == species_j)
+            ]
+            .set_index(["chain", "draw"])
+            .loc[chains_and_draws.tolist()]
+            .reset_index()
+        )
+        axes[species_to_ax[species_j]].plot(
+            abundance_sample.set_index("time")["abundance"],
+            alpha=0.5, color="skyblue", zorder=-1
+        )
+f.savefig("img/monod_priors.png")
+```
+
+### Sample in posterior mode
+
+```{python}
+stan_input_posterior = stan_input_common | {
+    "y": fake_measurements["simulated_measurement"],
+    "likelihood": 1
+}
+mcmc_posterior = model.sample(
+    data=stan_input_posterior,
+    iter_warmup=300,
+    iter_sampling=300,
+    chains=4,
+    refresh=1,
+    inits=true_param_values,
+    seed=SEED,
+)
+idata_posterior = az.from_cmdstanpy(
+    mcmc_posterior,
+    dims=dims,
+    coords=coords,
+    posterior_predictive={"y": "yrep"},
+    log_likelihood="llik"
+)
+idata_posterior
+```
+
+# Diagnostics: is the posterior ok?
+First check the `sample_stats` group to see if there were any divergent
+transitions and if the `lp` parameter converged.
+
+```{python}
+az.summary(idata_posterior.sample_stats)
+```
+
+Next check the parameter-by-parameter summary
+
+```{python}
+az.summary(idata_posterior)
+```
+
+Show posterior intervals
+
+```{python}
+posterior_abundances = (
+    idata_posterior
+    .posterior["abundance"]
+    .to_dataframe()
+    .reset_index()
+    .join(timepoints, on="timepoint")
+)
+n_sample = 20
+chains_and_draws = rng.choice(
+    posterior_abundances[["chain", "draw"]].values, 10
+)
+f, axes = plot_sim(true_abundance, fake_measurements, species_to_ax)
+for tube_i in tubes:
+    for species_j in species:
+        abundance_sample = (
+            posterior_abundances.loc[
+                lambda df: (df["tube"] == tube_i) & (df["species"] == species_j)
+            ]
+            .set_index(["chain", "draw"])
+            .loc[chains_and_draws.tolist()]
+            .reset_index()
+        )
+        axes[species_to_ax[species_j]].plot(
+            abundance_sample.set_index("time")["abundance"],
+            alpha=0.5, color="skyblue", zorder=-1
+        )
+f.savefig("img/monod_posteriors.png")
+```
+
+
+### look at the posterior
+
+The next few cells use arviz's
+[`plot_posterior`](https://arviz-devs.github.io/arviz/api/generated/arviz.plot_posterior.html)
+function to plot the marginal posterior distributions for some of the model's
+parameters:
+
+```{python}
+f, axes = plt.subplots(1, 4, figsize=[10, 4])
+axes = az.plot_posterior(
+    idata_posterior,
+    kind="hist",
+    bins=20,
+    var_names=["gamma"],
+    ax=axes,
+    point_estimate=None,
+    hdi_prob="hide"
+)
+for ax, true_value in zip(axes, true_param_values["gamma"]):
+    ax.axvline(true_value, color="red")
+```
+
+```{python}
+f, axes = plt.subplots(1, 4, figsize=[10, 4])
+axes = az.plot_posterior(
+    idata_posterior,
+    kind="hist",
+    bins=20,
+    var_names=["mu_max"],
+    ax=axes,
+    point_estimate=None,
+    hdi_prob="hide"
+)
+for ax, true_value in zip(axes, true_param_values["mu_max"]):
+    ax.axvline(true_value, color="red")
+```
+
+```{python}
+f, axes = plt.subplots(1, 4, figsize=[10, 4])
+axes = az.plot_posterior(
+    idata_posterior,
+    kind="hist",
+    bins=20,
+    var_names=["ks"],
+    ax=axes,
+    point_estimate=None,
+    hdi_prob="hide"
+)
+for ax, true_value in zip(axes, true_param_values["ks"]):
+    ax.axvline(true_value, color="red")
+```
+
+
+## References

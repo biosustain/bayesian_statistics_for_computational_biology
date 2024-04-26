@@ -74,7 +74,7 @@ Run an MCMC algorithm and inspect the results
 
 ### Week 3: [Metropolis-Hastings](metropolis-hastings.qmd)
  
-### Week 4: [After MCMC](after_mcmc.md): diagnostics, and decisions  
+### Week 4: [After MCMC](after_mcmc.qmd): diagnostics, and decisions  
 
 #### Theory 
 

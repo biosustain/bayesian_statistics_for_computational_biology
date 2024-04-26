@@ -17,6 +17,7 @@ project:
     - after_mcmc.qmd
     - regression.qmd
     - hierarchical_models.qmd
+    - odes.qmd
 
 website:
   title: "Bayesian Statistics for Computational Biology"
@@ -39,6 +40,7 @@ website:
         - after_mcmc.qmd
         - regression.qmd
         - hierarchical_models.qmd
+        - odes.qmd
 
 format:
   html:
