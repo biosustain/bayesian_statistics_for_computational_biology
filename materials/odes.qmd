@@ -204,8 +204,10 @@ true_param_values = {
     "t_ks": 0.3,
     "t_gamma": 0.13,
     "species_zero": [
-        [np.exp(np.random.normal(-2.1, 0.05)), np.exp(np.random.normal(0.2, 0.05))]
-        for _ in range(N_tube)
+        [
+            np.exp(np.random.normal(-2.1, 0.05)), 
+            np.exp(np.random.normal(0.2, 0.05))
+        ] for _ in range(N_tube)
     ],
     "sigma_y": [0.08, 0.1],
     "ln_mu_max_z": np.random.normal(0, 1, size=N_strain).tolist(),
@@ -424,30 +426,22 @@ idata_prior
 We can find the prior intervals for the true abundance and plot them in the graph.
 
 ```{python}
-prior_abundances = (
-    idata_prior
-    .posterior["abundance"]
-    .to_dataframe()
-    .reset_index()
-    .join(timepoints, on="timepoint")
-)
+prior_abundances = idata_prior.posterior["abundance"]
+
 n_sample = 20
-chains_and_draws = rng.choice(prior_abundances[["chain", "draw"]].values, 10)
+chains = rng.choice(prior_abundances.coords["chain"].values, n_sample)
+draws = rng.choice(prior_abundances.coords["draw"].values, n_sample)
 f, axes = plot_sim(true_abundance, fake_measurements, species_to_ax)
-for tube_i in tubes:
-    for species_j in species:
-        abundance_sample = (
-            prior_abundances.loc[
-                lambda df: (df["tube"] == tube_i) & (df["species"] == species_j)
-            ]
-            .set_index(["chain", "draw"])
-            .loc[chains_and_draws.tolist()]
-            .reset_index()
-        )
-        axes[species_to_ax[species_j]].plot(
-            abundance_sample.set_index("time")["abundance"],
-            alpha=0.5, color="skyblue", zorder=-1
-        )
+
+for ax, species_i in zip(axes, species):
+    for tube_j in tubes:
+        for chain, draw in zip(chains, draws):
+            timeseries = prior_abundances.sel(chain=chain, draw=draw, tube=tube_j, species=species_i)
+            ax.plot(
+                timepoints.values, 
+                timeseries.values,
+                alpha=0.5, color="skyblue", zorder=-1
+            )
 f.savefig("img/monod_priors.png")
 ```
 
@@ -494,32 +488,22 @@ az.summary(idata_posterior)
 Show posterior intervals
 
 ```{python}
-posterior_abundances = (
-    idata_posterior
-    .posterior["abundance"]
-    .to_dataframe()
-    .reset_index()
-    .join(timepoints, on="timepoint")
-)
+prior_abundances = idata_posterior.posterior["abundance"]
+
 n_sample = 20
-chains_and_draws = rng.choice(
-    posterior_abundances[["chain", "draw"]].values, 10
-)
+chains = rng.choice(prior_abundances.coords["chain"].values, n_sample)
+draws = rng.choice(prior_abundances.coords["draw"].values, n_sample)
 f, axes = plot_sim(true_abundance, fake_measurements, species_to_ax)
-for tube_i in tubes:
-    for species_j in species:
-        abundance_sample = (
-            posterior_abundances.loc[
-                lambda df: (df["tube"] == tube_i) & (df["species"] == species_j)
-            ]
-            .set_index(["chain", "draw"])
-            .loc[chains_and_draws.tolist()]
-            .reset_index()
-        )
-        axes[species_to_ax[species_j]].plot(
-            abundance_sample.set_index("time")["abundance"],
-            alpha=0.5, color="skyblue", zorder=-1
-        )
+
+for ax, species_i in zip(axes, species):
+    for tube_j in tubes:
+        for chain, draw in zip(chains, draws):
+            timeseries = prior_abundances.sel(chain=chain, draw=draw, tube=tube_j, species=species_i)
+            ax.plot(
+                timepoints.values, 
+                timeseries.values,
+                alpha=0.5, color="skyblue", zorder=-1
+            )
 f.savefig("img/monod_posteriors.png")
 ```
 

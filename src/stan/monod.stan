@@ -68,9 +68,9 @@ model {
   a_mu_max ~ normal(prior_a_mu_max[1], prior_a_mu_max[2]);
   a_ks ~ normal(prior_a_ks[1], prior_a_ks[2]);
   a_gamma ~ normal(prior_a_gamma[1], prior_a_gamma[2]);
-  t_mu_max ~ normal(prior_t_mu_max[1], prior_t_mu_max[2]);
-  t_ks ~ normal(prior_t_ks[1], prior_t_ks[2]);
-  t_gamma ~ normal(prior_t_gamma[1], prior_t_gamma[2]);
+  t_mu_max ~ lognormal(prior_t_mu_max[1], prior_t_mu_max[2]);
+  t_ks ~ lognormal(prior_t_ks[1], prior_t_ks[2]);
+  t_gamma ~ lognormal(prior_t_gamma[1], prior_t_gamma[2]);
   for (s in 1 : 2) {
     sigma_y[s] ~ lognormal(prior_sigma_y[s, 1], prior_sigma_y[s, 2]);
     for (t in 1 : N_tube){
