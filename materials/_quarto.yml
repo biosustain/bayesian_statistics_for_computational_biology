@@ -18,6 +18,7 @@ project:
     - regression.qmd
     - hierarchical_models.qmd
     - odes.qmd
+    - workflow.md
 
 website:
   title: "Bayesian Statistics for Computational Biology"
@@ -41,6 +42,7 @@ website:
         - regression.qmd
         - hierarchical_models.qmd
         - odes.qmd
+        - workflow.md
 
 format:
   html:

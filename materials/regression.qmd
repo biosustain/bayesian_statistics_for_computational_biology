@@ -226,7 +226,7 @@ ultimately save you a lot of trouble.
 
 ```{python}
 model = CmdStanModel(stan_file="../src/stan/pipette.stan")
-model.format(overwrite_file=True, canonicalize=True)
+model.format(overwrite_file=True, canonicalize=True, backup=False)
 print(model.code())
 ```
 
