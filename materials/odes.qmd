@@ -2,9 +2,9 @@
 
 Scientific knowledge often takes the form of specific relationships expressed by systems of equations. For example:
 
-- A system of ordinary differential equations connects some state variables $x$ with some other variables $v$ with equations with the form $\frac{dx}{dt}= f(x, v)$. 
-- An algebraic equation systems says that some variables $v$ are related so that $f(v) = 0$ 
-- A differential algebraic equation system says that some state variables' rates of change have the form $\frac{dx}{dt}= f(x, v)$ and that they satisfy some algebraic constraints $f(x,v)=0$.
+- A system of ordinary differential equations connects some state variables $x$ with some other variables $\theta$ with equations with the form $\frac{dx}{dt}= f(x,\theta, t)$. 
+- An algebraic equation systems says that some variables $v$ are related so that $f(x, \theta) = 0$ 
+- A differential algebraic equation system says that some state variables' rates of change have the form $\frac{dx}{dt}= f(x, \theta, t)$ and that they satisfy some algebraic constraints $f(x, \theta)=0$.
 
 If there is an analytic solution to the equation system, we can just include the solution in our statistical model like any other form of structural knowledge: easy! However, often we want to solve equations that are hard or impossible to solve analytically, but can be solved approximately using numerical methods.
 
@@ -23,16 +23,96 @@ Reading:
 - @timonenImportanceSamplingApproach2022
 - Stan user guide sections: [algebraic equation systems](https://mc-stan.org/docs/stan-users-guide/algebraic-equations.html), [ODE systems](https://mc-stan.org/docs/stan-users-guide/odes.html), [DAE systems](https://mc-stan.org/docs/stan-users-guide/dae.html).
 
+## Background
+### Differential Equations
+Are equations that relate functions to their derivatives. Some examples of
+these functions are quantities such as (1) The volume of the liquid in a 
+bioreactor over time
+$$
+\frac{dV}{dt} = F_{in} - F_{out}.
+$$
+(2) The temperature of a steel rod with heat source at one end
+$$
+\frac{dT}{dt} = \alpha \frac{d^{2}T}{dx^{2}}.
+$$
+(3) The concentration of a substrate in a bioreactor over time (example below). 
+As mentioned previously, the solution to many of these sorts of differential
+equations does not have an algebraic solution, such as $T(t) = f(x, t)$.
+
+### Ordinary Differential Equations (ODEs)
+Arguably, the most simple type of differential equation is what is known as
+an ordinary differential equation. This means that there is only one independent
+parameter, typically this will be either time or a dimension. We will only 
+consider ODEs for the remainder of the course. 
+
+To gain some intuition about what is going on we will investigate the height
+of an initially reactor over time with a constant flow rate into the reactor.
+
+![Reactor](img/reactor_ode.png)
+
+$$
+\frac{dV}{dt} = F_{in} - F_{out}
+$$
+$$
+\frac{dh}{dt} = \frac{F_{in} - F_{out}}{Area}
+$$
+$$
+              = \frac{0.1 - 0.02 * h}{1} (\frac{m^3}{min})
+$$
+
+This ODE is an example which can be manually integrated and has an 
+analytic solution. We shall investigate how the height changes over time
+and what the steady state height is.
+
+The first question is an example of an `initial-value problem`. Where we
+know the initial height (h=0), and we can solve the integral
+
+$$
+dh = \int_{t=0}^{t} 0.1 - 0.02*h dt.
+$$
+By using integrating factors (Don't worry about this) we can solve 
+for height
+$$
+h = \frac{0.1}{0.02} + Ce^{-0.02t}.
+$$
+Finally, we can solve for the height by substituting what we know:
+at $t = 0$, $h = 0$. Therefore, we arrive at the final equation
+$$
+ h = \frac{0.1}{0.02}(1 - e^{-0.02t}).
+$$
+
+We can answer the question about what its final height would be by solving 
+for the `steady-state`
+
+$$
+\frac{dh}{dt} = 0.
+$$
+
+Where after rearranging we find the final height equal to 5m, within the 
+dimensions of the reactor
+
+$$
+h = \frac{0.1}{0.02} (m).
+$$
+
+This is just a primer on differential equations. Solving differential
+equations using numerical solvers usually involves solving the 
+`initial-value problem`, but rather than solving it analytically, a
+(hopefully stable) solver will increment the time and state values 
+dependent on the rate equations. This is also an example of a single
+differential equation, however, we will investigate systems of equations
+as well. 
+
 ## Example
 We have some tubes containing a substrate $S$ and some biomass $C$ that we think
 approximately follow the Monod equation for microbial growth:
 
 \begin{align*}
-\frac{dC}{dt} &= \frac{\mu_{max}\cdot S(t)}{K_{S} + S(t)}\cdot C(t) \\
-\frac{dS}{dt} &= -\gamma \cdot \frac{\mu_{max}\cdot S(t)}{K_{s} + S(t)} \cdot C(t)
+\frac{dX}{dt} &= \frac{\mu_{max}\cdot S(t)}{K_{S} + S(t)}\cdot X(t) \\
+\frac{dS}{dt} &= -\gamma \cdot \frac{\mu_{max}\cdot S(t)}{K_{s} + S(t)} \cdot X(t)
 \end{align*}
 
-We measured $C$ and $S$ at different timepoints in some experiments and we want
+We measured $X$ and $S$ at different timepoints in some experiments and we want
 to try and find out $\mu_{max}$, $K_{S}$ and $\gamma$ for the different strains
 in the tubes.
 
@@ -40,9 +120,9 @@ You can read more about the Monod equation in @allenBacterialGrowthStatistical20
 
 ### What we know
 
-$\mu_{max}, K_S, \gamma, S, C$ are non-negative.
+$\mu_{max}, K_S, \gamma, S, X$ are non-negative.
 
-$S(0)$ and $C(0)$ vary a little by tube.
+$S(0)$ and $X(0)$ vary a little by tube.
 
 $\mu_{max}, K_S, \gamma$ vary by strain.
 
@@ -53,7 +133,7 @@ Measurement noise is roughly proportional to measured quantity.
 We use two regression models to describe the measurements:
 
 \begin{align*}
-y_C &\sim LN(\ln{\hat{C}}, \sigma_{C})  \\
+y_X &\sim LN(\ln{\hat{X}}, \sigma_{X})  \\
 y_S &\sim LN(\ln{\hat{S}}, \sigma_{S})
 \end{align*}
 
@@ -70,7 +150,7 @@ regression model:
 To get a true abundance given some parameters we put an ode in the model:
 
 $$
-\hat{C}(t), \hat{S}(t) = \text{solve-monod-equation}(t, C_0, S_0, \mu_max, \gamma, K_S)
+\hat{X}(t), \hat{S}(t) = \text{solve-monod-equation}(t, X_0, S_0, \mu_max, \gamma, K_S)
 $$
 
 ### imports
